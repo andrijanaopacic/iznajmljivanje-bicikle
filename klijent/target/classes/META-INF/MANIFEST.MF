@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: 21
+Class-Path: dependency/zajednicki-0.0.1-SNAPSHOT.jar dependency/gson-2.9
+ .0.jar dependency/AbsoluteLayout-RELEASE180.jar
+Main-Class: pokreni.PokreniKlijent
+Created-By: Maven Integration for Eclipse
+
