@@ -20,6 +20,7 @@ import operacije.bicikla.PretraziBiciklaSO;
 import operacije.bicikla.PromeniBiciklaSO;
 import operacije.bicikla.VratiListuBiciklaBiciklaSO;
 import operacije.bicikla.VratiListuSviBiciklaSO;
+import operacije.iznajmljivanje.GenerisiRacunSO;
 import operacije.iznajmljivanje.KreirajIznajmljivanjeSO;
 import operacije.iznajmljivanje.PretraziIznajmljivanjeSO;
 import operacije.iznajmljivanje.PromeniIznajmljivanjeSO;
@@ -386,6 +387,12 @@ public class ServerKontroler {
         VratiListuMestoMestoSO operacija = new VratiListuMestoMestoSO();
         operacija.izvrsiOperaciju(new Mesto(), mesto);
         return operacija.getLista();
+    }
+    
+    public boolean generisiRacun(Iznajmljivanje iznajmljivanje) throws Exception {
+        GenerisiRacunSO operacija = new GenerisiRacunSO();
+        operacija.izvrsiOperaciju(iznajmljivanje, null);
+        return operacija.getUspesno();
     }
 
 }
