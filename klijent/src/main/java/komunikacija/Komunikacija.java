@@ -615,7 +615,16 @@ public class Komunikacija {
         return (Mesto) so.getOdgovor();
     }
 
-
+    public String prikaziRacun(Iznajmljivanje iznajmljivanje) {
+        Zahtev zahtev = new Zahtev(Operacije.PRIKAZI_RACUN, iznajmljivanje);
+        posiljalac.posalji(zahtev);
+        Odgovor so = (Odgovor) primalac.primi();
+        if (so == null) {
+            JOptionPane.showMessageDialog(null, "Server nije u funkciji.", "Greška", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+        return (String) so.getOdgovor();
+    }
     
     
 }

@@ -36,6 +36,30 @@ public class IznajmljivanjeKontroler {
     }
 
     private void addActionListeners() {
+    	
+    	ki.PrikaziRacunAddActionListeners(new ActionListener() {
+    	    @Override
+    	    public void actionPerformed(ActionEvent e) {
+    	        if (ki.getIznajmljivanje() == null
+    	                || ki.getIznajmljivanje().getIdIznajmljivanje() <= 0) {
+    	            JOptionPane.showMessageDialog(ki,
+    	                    "Nema iznajmljivanja za prikaz računa.",
+    	                    "Upozorenje", JOptionPane.WARNING_MESSAGE);
+    	            return;
+    	        }
+    	        String racun = Komunikacija.getInstance().prikaziRacun(ki.getIznajmljivanje());
+    	        if (racun == null) {
+    	            JOptionPane.showMessageDialog(ki,
+    	                    "Račun nije pronađen.",
+    	                    "Greška", JOptionPane.ERROR_MESSAGE);
+    	        } else {
+    	            JOptionPane.showMessageDialog(ki, racun,
+    	                    "Račun za iznajmljivanje "
+    	                    + ki.getIznajmljivanje().getIdIznajmljivanje(),
+    	                    JOptionPane.INFORMATION_MESSAGE);
+    	        }
+    	    }
+    	});
 
         ki.ZapamtiAddActionListeners(new ActionListener() {
             @Override
@@ -543,7 +567,6 @@ public class IznajmljivanjeKontroler {
 
             popuniKupce();
             popuniProdavce();
-            // Bicikle se pune tek kada korisnik izabere tip
             ki.getjComboBoxBicikla().removeAllItems();
 
             popuniTabeluStavki(null);
@@ -557,6 +580,7 @@ public class IznajmljivanjeKontroler {
             ki.getjButtonDodajStavku().setVisible(true);
             ki.getjButtonOdustani().setVisible(true);
             ki.getjButtonObrisiStavku().setVisible(true);
+            ki.getjButtonPrikaziRacun().setVisible(false);
             ki.setVisible(true);
 
         } else {
@@ -583,6 +607,7 @@ public class IznajmljivanjeKontroler {
             ki.getjButtonObrisiStavku().setVisible(false);
             ki.getjButtonPromeni().setVisible(true);
             ki.getjButtonPrikazi().setVisible(false);
+            ki.getjButtonPrikaziRacun().setVisible(true);
 
             List<StavkaIznajmljivanja> listaStavki = iznajmljivanje.getListaStavkiIznajmljivanja();
             popuniTabeluStavki(listaStavki);

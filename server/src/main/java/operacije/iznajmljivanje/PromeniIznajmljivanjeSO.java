@@ -124,6 +124,14 @@ public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
 
             broker.edit(iznajmljivanjeZaPromenu);
             uspesno = true;
+            try {
+            	GenerisiRacunSO racunSO = new GenerisiRacunSO();
+                racunSO.izvrsiOperaciju(iznajmljivanjeZaPromenu, null);
+            } catch (Exception e) {
+                System.err.println("Upozorenje: Račun nije promenjen: " + e.getMessage());
+            }
         }
+        
     }
+    
 }

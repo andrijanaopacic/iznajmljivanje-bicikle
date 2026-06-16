@@ -108,6 +108,13 @@ public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
             }
 
             uspesno = true;
+            
+            try {
+                GenerisiRacunSO racunSO = new GenerisiRacunSO();
+                racunSO.izvrsiOperaciju(iznajmljivanje, null);
+            } catch (Exception e) {
+                System.err.println("Upozorenje: Račun nije generisan: " + e.getMessage());
+            }
         }
     }
 }
