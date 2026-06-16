@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import model.Iznajmljivanje;
 import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
@@ -92,28 +94,19 @@ public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
 
             List<StavkaIznajmljivanja> stavkeIzBaze = broker.getAll(new StavkaIznajmljivanja(), upit);
 
-            for (StavkaIznajmljivanja stBaza : stavkeIzBaze) {
-                boolean postojiUListiProsledjenih = false;
-                for (StavkaIznajmljivanja st : stavkeProsledjene) {
-                    if (stBaza.getIdStavkaIznajmljivanja() == st.getIdStavkaIznajmljivanja()) {
-                        postojiUListiProsledjenih = true;
-                        break;
-                    }
-                }
-                if (!postojiUListiProsledjenih) {
-                    stBaza.setIznajmljivanje(iznajmljivanjeZaPromenu);
-                    broker.delete(stBaza);
-                }
+            List<StavkaIznajmljivanja> zaBrisanje = stavkeIzBaze.stream()
+                    .filter(stBaza -> stavkeProsledjene.stream()
+                    .noneMatch(st -> st.getIdStavkaIznajmljivanja() == stBaza.getIdStavkaIznajmljivanja()))
+                    .collect(Collectors.toList());
+            
+            for (StavkaIznajmljivanja stBaza : zaBrisanje) {
+                stBaza.setIznajmljivanje(iznajmljivanjeZaPromenu);
+                broker.delete(stBaza);
             }
-
+            
             for (StavkaIznajmljivanja st : stavkeProsledjene) {
-                boolean postojiUBazi = false;
-                for (StavkaIznajmljivanja stBaza : stavkeIzBaze) {
-                    if (st.getIdStavkaIznajmljivanja() == stBaza.getIdStavkaIznajmljivanja()) {
-                        postojiUBazi = true;
-                        break;
-                    }
-                }
+                boolean postojiUBazi = stavkeIzBaze.stream()
+                        .anyMatch(stBaza -> st.getIdStavkaIznajmljivanja() == stBaza.getIdStavkaIznajmljivanja());
                 if (postojiUBazi) {
                     broker.edit(st);
                 } else {
@@ -121,9 +114,16 @@ public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
                     broker.add(st);
                 }
             }
+            
+            double ukupanIznos = stavkeProsledjene.stream()
+                    .mapToDouble(StavkaIznajmljivanja::getIznos)
+                    .sum();
 
+            iznajmljivanjeZaPromenu.setUkupanIznos(ukupanIznos);
             broker.edit(iznajmljivanjeZaPromenu);
+            
             uspesno = true;
+            
             try {
             	GenerisiRacunSO racunSO = new GenerisiRacunSO();
                 racunSO.izvrsiOperaciju(iznajmljivanjeZaPromenu, null);
