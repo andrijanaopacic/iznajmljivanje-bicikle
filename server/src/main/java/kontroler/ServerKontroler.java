@@ -23,6 +23,7 @@ import operacije.bicikla.VratiListuSviBiciklaSO;
 import operacije.iznajmljivanje.GenerisiRacunSO;
 import operacije.iznajmljivanje.KreirajIznajmljivanjeSO;
 import operacije.iznajmljivanje.PretraziIznajmljivanjeSO;
+import operacije.iznajmljivanje.PrikaziRacunSO;
 import operacije.iznajmljivanje.PromeniIznajmljivanjeSO;
 import operacije.iznajmljivanje.VratiListuIznajmljivanjeBiciklaSO;
 import operacije.iznajmljivanje.VratiListuIznajmljivanjeIznajmljivanjeSO;
@@ -393,6 +394,12 @@ public class ServerKontroler {
         GenerisiRacunSO operacija = new GenerisiRacunSO();
         operacija.izvrsiOperaciju(iznajmljivanje, null);
         return operacija.getUspesno();
+    }
+    
+    public String prikaziRacun(Iznajmljivanje iznajmljivanje) throws Exception {
+        PrikaziRacunSO operacija = new PrikaziRacunSO();
+        operacija.izvrsiOperaciju(iznajmljivanje, null);
+        return operacija.getRacun();
     }
 
 }

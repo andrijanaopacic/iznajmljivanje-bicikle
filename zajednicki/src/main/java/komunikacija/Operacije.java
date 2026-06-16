@@ -54,4 +54,5 @@ public enum Operacije implements Serializable {
     PROMENI_MESTO,
     OBRISI_MESTO,
     VRATI_LISTU_MESTO_MESTO,
+    PRIKAZI_RACUN
 }

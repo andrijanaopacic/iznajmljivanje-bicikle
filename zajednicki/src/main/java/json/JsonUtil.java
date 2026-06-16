@@ -79,4 +79,54 @@ public class JsonUtil {
             writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(racun));
         }
     }
+    
+    /**
+     * Deserijalizuje JSON racun i vraca osnovne podatke kao String prikaz.
+     * Koristi se za pregled prethodno generisanih racuna bez pozivanja baze.
+     *
+     * @param putanja putanja do JSON fajla
+     * @return String reprezentacija racuna
+     * @throws IOException ako dodje do greske pri citanju fajla
+     */
+    public static String deserijalizujRacun(String putanja) throws IOException {
+        try (FileReader reader = new FileReader(putanja)) {
+            JsonObject racun = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("=== RAČUN ===\n");
+            sb.append("ID iznajmljivanja: ").append(racun.get("idIznajmljivanje").getAsInt()).append("\n");
+            sb.append("Datum generisanja: ").append(racun.get("datumGenerisanja").getAsString()).append("\n\n");
+
+            JsonObject prodavac = racun.getAsJsonObject("prodavac");
+            sb.append("Prodavac: ").append(prodavac.get("ime").getAsString())
+                    .append(" ").append(prodavac.get("prezime").getAsString()).append("\n");
+
+            JsonObject kupac = racun.getAsJsonObject("kupac");
+            sb.append("Kupac: ").append(kupac.get("ime").getAsString())
+                    .append(" ").append(kupac.get("prezime").getAsString()).append("\n");
+            sb.append("Broj lične karte: ").append(kupac.get("brojLicneKarte").getAsString()).append("\n");
+            sb.append("Mesto: ").append(kupac.get("mesto").getAsString()).append("\n\n");
+
+            sb.append("--- Stavke ---\n");
+            JsonArray stavke = racun.getAsJsonArray("stavkeIznajmljivanja");
+            for (int i = 0; i < stavke.size(); i++) {
+                JsonObject stavka = stavke.get(i).getAsJsonObject();
+                sb.append(i + 1).append(". ")
+                        .append(stavka.get("tipBicikle").getAsString()).append(" - ")
+                        .append(stavka.get("marka").getAsString()).append(" ")
+                        .append(stavka.get("model").getAsString()).append("\n");
+                sb.append("   Od: ").append(stavka.get("vremeOd").getAsString())
+                        .append(" Do: ").append(stavka.get("vremeDo").getAsString()).append("\n");
+                sb.append("   Sati: ").append(stavka.get("brojSati").getAsInt())
+                        .append(", Dana: ").append(stavka.get("brojDana").getAsInt()).append("\n");
+                sb.append("   Cena: ").append(stavka.get("cena").getAsDouble())
+                        .append(" RSD, Iznos: ").append(stavka.get("iznos").getAsDouble()).append(" RSD\n");
+            }
+
+            sb.append("\nUkupan iznos: ").append(racun.get("ukupanIznos").getAsDouble()).append(" RSD");
+            return sb.toString();
+        }
+    }
+    
+    
 }

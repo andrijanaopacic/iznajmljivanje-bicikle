@@ -311,6 +311,11 @@ public class ObradaKlijentskihZahteva extends Thread {
 
                             posiljalac.posalji(so);
                             break;
+                        case PRIKAZI_RACUN:
+                            String racun = ServerKontroler.getInstance().prikaziRacun((Iznajmljivanje) kz.getParametar());
+                            so.setOdgovor(racun);
+                            posiljalac.posalji(so);
+                            break;
                         default:
                             System.err.println("Nepoznata operacija: " + kz.getOperacija());
                             System.err.println("GREŠKA: Nepoznata sistemska operacija.");

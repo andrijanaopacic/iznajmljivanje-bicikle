@@ -40,6 +40,7 @@ public class KreirajIznajmljivanje extends javax.swing.JDialog {
     public JButton getjButtonPromeni() { return jButtonPromeni; }
     public JButton getjButtonSacuvaj() { return jButtonSacuvaj; }
     public JButton getjButtonZapamti() { return jButtonZapamti; }
+    public JButton getjButtonPrikaziRacun() { return jButtonPrikaziRacun; }
     public JComboBox<Bicikla> getjComboBoxBicikla() { return jComboBoxBicikla; }
     public JComboBox<String> getjComboBoxTipBicikle() { return jComboBoxTipBicikle; }
     public JComboBox<Kupac> getjComboBoxKupac() { return jComboBoxKupac; }
@@ -64,6 +65,7 @@ public class KreirajIznajmljivanje extends javax.swing.JDialog {
         jButtonSacuvaj = new javax.swing.JButton();
         jButtonZapamti = new javax.swing.JButton();
         jButtonOdustani = new javax.swing.JButton();
+        jButtonPrikaziRacun = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -132,6 +134,10 @@ public class KreirajIznajmljivanje extends javax.swing.JDialog {
         jButtonOdustani.setText("Odustani");
         getContentPane().add(jButtonOdustani,
                 new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 690, 138, -1));
+
+        jButtonPrikaziRacun.setText("Prikaži račun");
+        getContentPane().add(jButtonPrikaziRacun,
+                new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 690, 180, -1));
 
         // Panel za stavku iznajmljivanja
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -203,6 +209,7 @@ public class KreirajIznajmljivanje extends javax.swing.JDialog {
     private javax.swing.JButton jButtonPromeni;
     private javax.swing.JButton jButtonSacuvaj;
     private javax.swing.JButton jButtonZapamti;
+    private javax.swing.JButton jButtonPrikaziRacun;
     private javax.swing.JComboBox<Bicikla> jComboBoxBicikla;
     private javax.swing.JComboBox<String> jComboBoxTipBicikle;
     private javax.swing.JComboBox<Kupac> jComboBoxKupac;
@@ -254,5 +261,9 @@ public class KreirajIznajmljivanje extends javax.swing.JDialog {
 
     public void TipBicikleAddActionListeners(ActionListener actionListener) {
         jComboBoxTipBicikle.addActionListener(actionListener);
+    }
+
+    public void PrikaziRacunAddActionListeners(ActionListener actionListener) {
+        jButtonPrikaziRacun.addActionListener(actionListener);
     }
 }
