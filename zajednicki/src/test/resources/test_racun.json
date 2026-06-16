@@ -1,0 +1,31 @@
+{
+  "idIznajmljivanje": 1,
+  "datumGenerisanja": "16.06.2026. 10:00:00",
+  "ukupanIznos": 5000.0,
+  "ukupanIznosEUR": 42.55,
+  "prodavac": {
+    "ime": "Ana",
+    "prezime": "Anic",
+    "korisnickoIme": "aanic"
+  },
+  "kupac": {
+    "ime": "Marko",
+    "prezime": "Markovic",
+    "brojLicneKarte": "123456789",
+    "mesto": "Beograd"
+  },
+  "stavkeIznajmljivanja": [
+    {
+      "idStavka": 1,
+      "marka": "Trek",
+      "model": "Marlin",
+      "tipBicikle": "Bicikla za odrasle",
+      "vremeOd": "10.10.2025. 10:00:00",
+      "vremeDo": "10.10.2025. 12:00:00",
+      "brojSati": 2,
+      "brojDana": 0,
+      "cena": 500.0,
+      "iznos": 1000.0
+    }
+  ]
+}
