@@ -26,14 +26,7 @@ public class JsonUtil {
 
     private static final DateTimeFormatter FORMATTER =  DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss");
 
-    /**
-     * Serijalizuje iznajmljivanje kao racun u JSON fajl.
-     * Rucno gradi JSON strukturu da bi izbegao probleme sa LocalDateTime.
-     *
-     * @param iznajmljivanje iznajmljivanje koje se serijalizuje
-     * @param putanja putanja do JSON fajla
-     * @throws IOException ako dodje do greske pri pisanju fajla
-     */
+    
     public static void serijalizujRacun(Iznajmljivanje iznajmljivanje, String putanja) throws IOException {
         JsonObject racun = new JsonObject();
         racun.addProperty("idIznajmljivanje", iznajmljivanje.getIdIznajmljivanje());
@@ -80,14 +73,7 @@ public class JsonUtil {
         }
     }
     
-    /**
-     * Deserijalizuje JSON racun i vraca osnovne podatke kao String prikaz.
-     * Koristi se za pregled prethodno generisanih racuna bez pozivanja baze.
-     *
-     * @param putanja putanja do JSON fajla
-     * @return String reprezentacija racuna
-     * @throws IOException ako dodje do greske pri citanju fajla
-     */
+    
     public static String deserijalizujRacun(String putanja) throws IOException {
         try (FileReader reader = new FileReader(putanja)) {
             JsonObject racun = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
