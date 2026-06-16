@@ -112,6 +112,8 @@ public class JsonUtil {
             sb.append("\nUkupan iznos: ").append(racun.get("ukupanIznos").getAsDouble()).append(" RSD");
             return sb.toString();
         }
+        
+        
     }
     
     
