@@ -34,6 +34,13 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
+        <dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-core</artifactId>
+		    <version>5.3.1</version>
+		    <scope>test</scope>
+		</dependency>
+		
     </dependencies>
 </dependencyManagement>
 
@@ -62,6 +69,13 @@
 	                        </pluginExecution>
 	                    </pluginExecutions>
 	                </lifecycleMappingMetadata>
+	            </configuration>
+	        </plugin>
+	        <plugin>
+	            <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-surefire-plugin</artifactId>
+	            <configuration>
+	                <argLine>-XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
 	            </configuration>
 	        </plugin>
 	    </plugins>
