@@ -1,0 +1,31 @@
+{
+  "idIznajmljivanje": 122,
+  "datumGenerisanja": "16.06.2026. 12:46:52",
+  "ukupanIznos": 500.0,
+  "ukupanIznosEUR": 4.26,
+  "prodavac": {
+    "ime": "Andrijana",
+    "prezime": "Opacic",
+    "korisnickoIme": "andrijana"
+  },
+  "kupac": {
+    "ime": "Danica",
+    "prezime": "Kontic",
+    "brojLicneKarte": "010120241",
+    "mesto": "Beograd"
+  },
+  "stavkeIznajmljivanja": [
+    {
+      "idStavka": 1,
+      "marka": "Giant",
+      "model": "Escape 3",
+      "tipBicikle": "Bicikla za odrasle",
+      "vremeOd": "01.06.2026. 09:55:55",
+      "vremeDo": "01.06.2026. 10:55:55",
+      "brojSati": 1,
+      "brojDana": 0,
+      "cena": 500.0,
+      "iznos": 500.0
+    }
+  ]
+}

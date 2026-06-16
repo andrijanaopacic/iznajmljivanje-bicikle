@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 
@@ -32,6 +33,16 @@ public class JsonUtil {
         racun.addProperty("idIznajmljivanje", iznajmljivanje.getIdIznajmljivanje());
         racun.addProperty("datumGenerisanja", LocalDateTime.now().format(FORMATTER));
         racun.addProperty("ukupanIznos", iznajmljivanje.getUkupanIznos());
+        
+        try {
+            double kurs = vratiKursRsdEur();
+            double ukupanIznosEUR = Math.round(iznajmljivanje.getUkupanIznos() * kurs * 100.0) / 100.0;
+            racun.addProperty("ukupanIznosEUR", ukupanIznosEUR);
+            System.out.println("Kurs RSD/EUR: " + kurs + ", Iznos u EUR: " + ukupanIznosEUR);
+        } catch (Exception e) {
+            System.err.println("Upozorenje: Nije moguće dobiti kurs valuta: " + e.getMessage());
+            racun.addProperty("ukupanIznosEUR", "N/A");
+        }
 
         JsonObject prodavac = new JsonObject();
         prodavac.addProperty("ime", iznajmljivanje.getProdavac().getIme());
@@ -76,7 +87,7 @@ public class JsonUtil {
     
     public static String deserijalizujRacun(String putanja) throws IOException {
         try (FileReader reader = new FileReader(putanja)) {
-            JsonObject racun = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
+            JsonObject racun = JsonParser.parseReader(reader).getAsJsonObject();
 
             StringBuilder sb = new StringBuilder();
             sb.append("=== RAČUN ===\n");
@@ -110,11 +121,37 @@ public class JsonUtil {
             }
 
             sb.append("\nUkupan iznos: ").append(racun.get("ukupanIznos").getAsDouble()).append(" RSD");
+            if (racun.has("ukupanIznosEUR") && !racun.get("ukupanIznosEUR").getAsString().equals("N/A")) {
+                sb.append("\nUkupan iznos: ").append(racun.get("ukupanIznosEUR").getAsDouble()).append(" EUR");
+            }
             return sb.toString();
         }
         
         
     }
     
+    
+    public static double vratiKursRsdEur() throws Exception {
+        String urlString = "https://open.er-api.com/v6/latest/RSD";
+
+        java.net.URL url = new java.net.URL(urlString);
+        java.net.HttpURLConnection con = (java.net.HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setConnectTimeout(5000);
+        con.setReadTimeout(5000);
+
+        StringBuilder response = new StringBuilder();
+        try (java.io.BufferedReader in = new java.io.BufferedReader(
+                new java.io.InputStreamReader(con.getInputStream()))) {
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+        }
+        
+        JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
+        JsonObject rates = jsonObject.getAsJsonObject("rates");
+        return rates.get("EUR").getAsDouble();
+    }
     
 }
