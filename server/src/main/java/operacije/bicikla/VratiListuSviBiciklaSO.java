@@ -18,13 +18,11 @@ public class VratiListuSviBiciklaSO extends ApstraktnaGenerickaOperacija {
 
     @Override
     protected void preduslovi(Object objekat) throws Exception {
-        // nema posebnih preduslova
     }
 
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         lista = new ArrayList<>();
-        // Svaki broker.getAll poziv automatski koristi JOIN iz vratiNazivTabele()
         lista.addAll(broker.getAll(new BiciklaZaOdrasle(), ""));
         lista.addAll(broker.getAll(new BiciklaZaDecu(), ""));
         lista.addAll(broker.getAll(new BiciklaSaRiksom(), ""));

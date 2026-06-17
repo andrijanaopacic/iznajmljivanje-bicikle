@@ -1,13 +1,23 @@
 package operacije.kupac;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import model.Kupac;
+import model.Mesto;
+import operacije.ApstraktnaGenerickaOperacija;
+import repozitorijum.db.impl.DBRepozitorijumGenericki;
 
+@DisplayName("Testovi za SO VratiListuSviKupciSO")
 class VratiListuSviKupciSOTest {
 
     VratiListuSviKupciSO so;
@@ -23,12 +33,68 @@ class VratiListuSviKupciSOTest {
     }
 
     @Test
-    void testPreduusloviNull() {
-        assertThrows(Exception.class, () -> so.izvrsiOperaciju(null, null));
+    void testGetListaPocetnaVrednost() {
+        assertNull(so.getLista(), "Početna vrednost liste mora biti null");
     }
 
     @Test
-    void testPreduusloviPogrešanTip() {
-        assertThrows(Exception.class, () -> so.izvrsiOperaciju("pogrešan tip", null));
+    void testPreduusloviNull() {
+        Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(null, null));
+        assertTrue(ex.getMessage().contains("odgovarajućeg tipa"));
+    }
+
+    @Test
+    void testPreduusloviPogresanTip() {
+        Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju("pogrešan tip", null));
+        assertTrue(ex.getMessage().contains("odgovarajućeg tipa"));
+    }
+
+    /**
+     * Pomocna metoda koja injektuje mock broker u SO objekat preko refleksije.
+     */
+    private VratiListuSviKupciSO napraviSOSaMockom(DBRepozitorijumGenericki mockBroker) throws Exception {
+        VratiListuSviKupciSO soSaMockom = new VratiListuSviKupciSO();
+        Field brokerField = ApstraktnaGenerickaOperacija.class.getDeclaredField("broker");
+        brokerField.setAccessible(true);
+        brokerField.set(soSaMockom, mockBroker);
+        return soSaMockom;
+    }
+
+    @Test
+    void testIzvrsiVracaSveKupce() throws Exception {
+        Kupac parametar = new Kupac();
+
+        Kupac kupac1 = new Kupac(1, "Marko", "Markovic", "123456789", new Mesto(1, "Beograd"));
+        Kupac kupac2 = new Kupac(2, "Ana", "Anic", "987654321", new Mesto(2, "Novi Sad"));
+        List<Kupac> ocekivanaLista = new ArrayList<>();
+        ocekivanaLista.add(kupac1);
+        ocekivanaLista.add(kupac2);
+
+        DBRepozitorijumGenericki mockBroker = mock(DBRepozitorijumGenericki.class);
+        when(mockBroker.getAll(eq(parametar), anyString())).thenReturn((List) ocekivanaLista);
+
+        VratiListuSviKupciSO soSaMockom = napraviSOSaMockom(mockBroker);
+
+        soSaMockom.izvrsiOperaciju(parametar, null);
+
+        assertNotNull(soSaMockom.getLista());
+        assertEquals(2, soSaMockom.getLista().size());
+        assertTrue(soSaMockom.getLista().contains(kupac1));
+        assertTrue(soSaMockom.getLista().contains(kupac2));
+    }
+
+    @Test
+    void testIzvrsiPraznaListaKadaNemaKupaca() throws Exception {
+        Kupac parametar = new Kupac();
+
+        DBRepozitorijumGenericki mockBroker = mock(DBRepozitorijumGenericki.class);
+        when(mockBroker.getAll(eq(parametar), anyString())).thenReturn(new ArrayList<>());
+
+        VratiListuSviKupciSO soSaMockom = napraviSOSaMockom(mockBroker);
+
+        soSaMockom.izvrsiOperaciju(parametar, null);
+
+        assertNotNull(soSaMockom.getLista());
+        assertTrue(soSaMockom.getLista().isEmpty());
     }
 }

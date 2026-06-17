@@ -23,7 +23,6 @@ public class ObrisiBiciklaSO extends ApstraktnaGenerickaOperacija {
         }
         Bicikla bicikla = (Bicikla) objekat;
         try {
-            // Proveravamo u bicikla tabeli jer je idBicikla tamo primarni kljuc
             String upit = "SELECT * FROM bicikla"
                     + " JOIN stavkaiznajmljivanja si ON si.idBicikla = bicikla.idBicikla"
                     + " WHERE bicikla.idBicikla = " + bicikla.getIdBicikla();
@@ -42,13 +41,11 @@ public class ObrisiBiciklaSO extends ApstraktnaGenerickaOperacija {
         if (!uUpotrebi) {
             Bicikla bicikla = (Bicikla) objekat;
 
-            // Brisemo iz podtabele prvo zbog stranog kljuca
             String upit1 = "DELETE FROM " + bicikla.vratiNazivPodTabele()
                     + " WHERE idBicikla = " + bicikla.getIdBicikla();
             Statement st = DBKonekcija.getInstance().getConnection().createStatement();
             st.executeUpdate(upit1);
 
-            // Pa brisemo iz roditeljske tabele
             String upit2 = "DELETE FROM bicikla WHERE idBicikla = " + bicikla.getIdBicikla();
             st.executeUpdate(upit2);
 
