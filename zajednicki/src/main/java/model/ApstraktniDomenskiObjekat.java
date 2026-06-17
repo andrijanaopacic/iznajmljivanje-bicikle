@@ -8,13 +8,23 @@ import java.io.Serializable;
 import java.util.List;
 import java.sql.ResultSet;
 /**
- *
- * @author HP
+ * Predstavlja modele sistema.
+ * @author Andrijana Opacic
  */
 public interface ApstraktniDomenskiObjekat extends Serializable {
     
+	/**
+	 * Vraca naziv tabele iz baze podataka.
+	 * @return Naziv tabele iz koje se ucitavaju podaci.
+	 */
     public String vratiNazivTabele();
     
+    /**
+     * Vraca listu sa svim podacima vezanim za taj model.
+     * @param rs
+     * @return
+     * @throws Exception
+     */
     public List<ApstraktniDomenskiObjekat> vratiListu(ResultSet rs) throws Exception;
     
     public String vratiKoloneZaUbacivanje();
