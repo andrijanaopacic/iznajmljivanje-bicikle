@@ -7,15 +7,41 @@ import model.Bicikla;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
+/**
+ * Sistemska operacija za brisanje bicikle.
+ * Pre brisanja proverava da li je bicikla u upotrebi, odnosno da li
+ * postoji stavka iznajmljivanja koja referencira tu biciklu.
+ *
+ * @author Andrijana Opacic
+ * @see Bicikla
+ */
 public class ObrisiBiciklaSO extends ApstraktnaGenerickaOperacija {
 
+	/** Indikator uspesnosti brisanja bicikle. */
     private boolean uspesno = false;
+    
+    /** Indikator da li je bicikla u upotrebi, odnosno da li postoji stavka iznajmljivanja koja je referencira. */
     private boolean uUpotrebi = false;
 
+    /**
+     * Vraca indikator uspesnosti brisanja bicikle.
+     *
+     * @return true ako je bicikla uspesno obrisana, false inace
+     */
     public boolean getUspesno() {
         return uspesno;
     }
 
+    /**
+     * Proverava preduslove pre brisanja bicikle.
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa i
+     * da li postoji stavka iznajmljivanja koja referencira tu biciklu,
+     * odnosno da li je bicikla u upotrebi.
+     *
+     * @param objekat objekat tipa {@link Bicikla} koji se brise
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws SQLException ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Bicikla)) {
@@ -37,18 +63,25 @@ public class ObrisiBiciklaSO extends ApstraktnaGenerickaOperacija {
         }
     }
 
+    /**
+     * Izvrsava brisanje bicikle iz baze podataka.
+     * Bicikla se brise samo ako nije u upotrebi. Prvo se brisu specificni
+     * atributi iz podtabele konkretnog tipa bicikle (zbog stranog kljuca),
+     * a zatim se brise zajednicki zapis iz tabele "bicikla".
+     *
+     * @param objekat objekat tipa {@link Bicikla} koji se brise
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!uUpotrebi) {
             Bicikla bicikla = (Bicikla) objekat;
 
-            // Brisemo iz podtabele prvo zbog stranog kljuca
-            String upit1 = "DELETE FROM " + bicikla.vratiNazivPodTabele()
-                    + " WHERE idBicikla = " + bicikla.getIdBicikla();
+            String upit1 = "DELETE FROM " + bicikla.vratiNazivPodTabele() + " WHERE idBicikla = " + bicikla.getIdBicikla();
             Statement st = DBKonekcija.getInstance().getConnection().createStatement();
             st.executeUpdate(upit1);
 
-            // Pa brisemo iz roditeljske tabele
             String upit2 = "DELETE FROM bicikla WHERE idBicikla = " + bicikla.getIdBicikla();
             st.executeUpdate(upit2);
 
