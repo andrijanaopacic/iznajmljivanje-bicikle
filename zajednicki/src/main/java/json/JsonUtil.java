@@ -12,22 +12,41 @@ import com.google.gson.JsonSerializer;
 import model.Iznajmljivanje;
 import model.StavkaIznajmljivanja;
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Utility klasa za serijalizaciju i deserijalizaciju JSON fajlova.
+ * Klasa za serijalizaciju i deserijalizaciju JSON fajlova.
  * Koristi Gson biblioteku za konverziju Java objekata u JSON format i obrnuto.
  */
 public class JsonUtil {
 
+	/**
+	 * Format koji se koristi za prikaz datuma i vremena u racunu:
+	 * "dd.MM.yyyy. HH:mm:ss".
+	 */
     private static final DateTimeFormatter FORMATTER =  DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss");
 
-    
+    /**
+     * Serijalizuje racun za dato iznajmljivanje u JSON fajl na zadatoj putanji.
+     * Racun sadrzi osnovne podatke o iznajmljivanju, podatke o prodavcu i kupcu,
+     * sve stavke iznajmljivanja, i ukupan iznos u RSD. Ukoliko je dostupna internet
+     * konekcija, dodaje se i ukupan iznos preracunat u EUR na osnovu trenutnog kursa;
+     * u suprotnom se za iznos u EUR upisuje vrednost "N/A".
+     * Ako folder na zadatoj putanji ne postoji, kreira se automatski.
+     *
+     * @param iznajmljivanje iznajmljivanje za koje se generise racun
+     * @param putanja putanja fajla u koji se racun upisuje
+     * @throws IOException ako dodje do greske prilikom pisanja u fajl
+     */
     public static void serijalizujRacun(Iznajmljivanje iznajmljivanje, String putanja) throws IOException {
         JsonObject racun = new JsonObject();
         racun.addProperty("idIznajmljivanje", iznajmljivanje.getIdIznajmljivanje());
@@ -84,7 +103,15 @@ public class JsonUtil {
         }
     }
     
-    
+    /**
+     * Deserijalizuje racun iz JSON fajla na zadatoj putanji i formatira ga
+     * kao tekstualni prikaz pogodan za ispis korisniku.
+     *
+     * @param putanja putanja JSON fajla koji sadrzi racun
+     * @return tekstualni prikaz racuna sa podacima o iznajmljivanju, prodavcu,
+     *         kupcu, svim stavkama i ukupnim iznosom (u RSD, i u EUR ako je dostupan)
+     * @throws IOException ako dodje do greske prilikom citanja fajla
+     */
     public static String deserijalizujRacun(String putanja) throws IOException {
         try (FileReader reader = new FileReader(putanja)) {
             JsonObject racun = JsonParser.parseReader(reader).getAsJsonObject();
@@ -130,19 +157,25 @@ public class JsonUtil {
         
     }
     
-    
+    /**
+     * Dobavlja trenutni kurs RSD u EUR pozivanjem eksternog web servisa
+     * (open.er-api.com).
+     *
+     * @return kurs RSD u EUR (koliko EUR vredi 1 RSD)
+     * @throws Exception ako dodje do greske prilikom poziva web servisa
+     *         ili obrade odgovora
+     */
     public static double vratiKursRsdEur() throws Exception {
         String urlString = "https://open.er-api.com/v6/latest/RSD";
 
-        java.net.URL url = new java.net.URL(urlString);
-        java.net.HttpURLConnection con = (java.net.HttpURLConnection) url.openConnection();
+        URL url = new URL(urlString);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setConnectTimeout(5000);
         con.setReadTimeout(5000);
 
         StringBuilder response = new StringBuilder();
-        try (java.io.BufferedReader in = new java.io.BufferedReader(
-                new java.io.InputStreamReader(con.getInputStream()))) {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);

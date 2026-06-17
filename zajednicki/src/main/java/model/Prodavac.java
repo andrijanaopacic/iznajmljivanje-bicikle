@@ -11,22 +11,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
+ * Predstavlja prodavca koji obradjuje iznajmljivanja bicikli.
+ * Sadrzi podatke za prijavu prodavca (korisnicko ime i sifra) i listu
+ * termina u kojima je prodavac dostupan.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see ProdavacTermin
+ * @see Iznajmljivanje
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class Prodavac implements ApstraktniDomenskiObjekat,Serializable {
     
+	/** Jedinstveni identifikator prodavca u bazi podataka. */
     private int idProdavac;
+    
+    /** Ime prodavca. */
     private String ime;
+    
+    /** Prezime prodavca. */
     private String prezime;
+    
+    /** Korisnicko ime prodavca koje se koristi za prijavu. */
     private String korisnickoIme;
+    
+    /** Sifra prodavca koja se koristi za prijavu. */
     private String sifra;
+    
+    /** Lista termina u kojima je prodavac dostupan. */
     List<ProdavacTermin> prodavacTermini;
 
-    public Prodavac() {
-    }
-
+    /**
+     * Konstruktor koji inicijalizuje sve atribute prodavca ukljucujuci i ID.
+     *
+     * @param idProdavac jedinstveni identifikator prodavca
+     * @param ime ime prodavca
+     * @param prezime prezime prodavca
+     * @param korisnickoIme korisnicko ime za prijavu
+     * @param sifra sifra za prijavu
+     */
     public Prodavac(int idProdavac, String ime, String prezime, String korisnickoIme, String sifra) {
         this.idProdavac = idProdavac;
         this.ime = ime;
@@ -36,6 +65,15 @@ public class Prodavac implements ApstraktniDomenskiObjekat,Serializable {
         this.prodavacTermini = new ArrayList<>();
     }
     
+    /**
+     * Konstruktor koji inicijalizuje atribute prodavca bez ID-a.
+     * Koristi se prilikom kreiranja novog prodavca pre unosa u bazu podataka.
+     *
+     * @param ime ime prodavca
+     * @param prezime prezime prodavca
+     * @param korisnickoIme korisnicko ime za prijavu
+     * @param sifra sifra za prijavu
+     */
     public Prodavac(String ime, String prezime, String korisnickoIme, String sifra) {
         this.ime = ime;
         this.prezime = prezime;
@@ -44,71 +82,49 @@ public class Prodavac implements ApstraktniDomenskiObjekat,Serializable {
         this.prodavacTermini = new ArrayList<>();
     }
     
+    /**
+     * Konstruktor koji inicijalizuje samo podatke za prijavu prodavca.
+     * Koristi se prilikom prijave prodavca u sistem.
+     *
+     * @param korisnickoIme korisnicko ime za prijavu
+     * @param sifra sifra za prijavu
+     */
     public Prodavac(String korisnickoIme, String sifra) {
         this.korisnickoIme = korisnickoIme;
         this.sifra = sifra;
         this.prodavacTermini = new ArrayList<>();
     }
-
-    public List<ProdavacTermin> getProdavacTermini() {
-        return prodavacTermini;
-    }
-
-    public void setProdavacTermini(List<ProdavacTermin> prodavacTermini) {
-        this.prodavacTermini = prodavacTermini;
-    }
-
-    public int getIdProdavac() {
-        return idProdavac;
-    }
-
-    public void setIdProdavac(int idProdavac) {
-        this.idProdavac = idProdavac;
-    }
-
-    public String getIme() {
-        return ime;
-    }
-
-    public void setIme(String ime) {
-        this.ime = ime;
-    }
-
-    public String getPrezime() {
-        return prezime;
-    }
-
-    public void setPrezime(String prezime) {
-        this.prezime = prezime;
-    }
-
-    public String getKorisnickoIme() {
-        return korisnickoIme;
-    }
-
-    public void setKorisnickoIme(String korisnickoIme) {
-        this.korisnickoIme = korisnickoIme;
-    }
-
-    public String getSifra() {
-        return sifra;
-    }
-
-    public void setSifra(String sifra) {
-        this.sifra = sifra;
-    }
-
+    
+    /**
+     * Vraca tekstualnu reprezentaciju prodavca koja sadrzi ime i prezime.
+     *
+     * @return string sa imenom i prezimenom prodavca
+     */
     @Override
     public String toString() {
         return ime + " " + prezime;
     }
 
+    /**
+     * Vraca hash kod prodavca racunat na osnovu korisnickog imena i sifre,
+     * u skladu sa atributima koje koristi {@link #equals(Object)}.
+     *
+     * @return hash kod prodavca
+     */
     @Override
     public int hashCode() {
-        int hash = 5;
-        return hash;
+        return Objects.hash(korisnickoIme, sifra);
     }
 
+    /**
+     * Poredi ovog prodavca sa drugim objektom na osnovu korisnickog imena i sifre,
+     * a ne na osnovu jedinstvenog identifikatora. Ovo je specificno za prodavca jer
+     * se prijava u sistem vrsi preko korisnickog imena i sifre.
+     *
+     * @param obj objekat sa kojim se poredi
+     * @return true ako su prodavci istog tipa i imaju isto korisnickoIme i sifru, false ako je
+     *         obj null, ako je obj drugog tipa, ili ako se korisnickoIme ili sifra razlikuju
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -127,8 +143,11 @@ public class Prodavac implements ApstraktniDomenskiObjekat,Serializable {
         return Objects.equals(this.sifra, other.sifra);
     }
 
-    
-
+    /**
+     * Vraca naziv tabele "prodavac" u bazi podataka.
+     *
+     * @return naziv tabele "prodavac"
+     */
     @Override
     public String vratiNazivTabele() {
         return "prodavac";

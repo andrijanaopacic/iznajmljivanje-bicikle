@@ -8,21 +8,68 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Predstavlja stavku iznajmljivanja koja opisuje jednu iznajmljenu biciklu
+ * u okviru iznajmljivanja. Cena i ukupan iznos stavke se automatski
+ * izracunavaju na osnovu cene bicikle i broja iznajmljenih dana ili sati.
+ *
+ * @author Andrijana Opacic
+ * @see Iznajmljivanje
+ * @see Bicikla
+ */
+@Getter
+@Setter
+@NoArgsConstructor
 public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializable {
 
+	/** Iznajmljena bicikla u okviru ove stavke. */
     private Bicikla bicikla;
+    
+    /** Jedinstveni identifikator stavke iznajmljivanja u bazi podataka. */
     private int idStavkaIznajmljivanja;
+    
+    /** Ukupan iznos za ovu stavku, izracunat na osnovu cene i broja dana ili sati. */
     private double iznos;
+    
+    /** Cena po danu ili po satu, preuzeta od bicikle u zavisnosti od broja dana. */
     private double cena;
+    
+    /** Vreme od kada je bicikla iznajmljena. */
     private LocalDateTime vremeOd;
+    
+    /** Vreme do kada je bicikla iznajmljena. */
     private LocalDateTime vremeDo;
+    
+    /** Broj sati na koje je bicikla iznajmljena, ako se iznajmljuje po satu. */
     private int brojSati;
+    
+    /** Broj dana na koje je bicikla iznajmljena, ako se iznajmljuje po danu. */
     private int brojDana;
+    
+    /** Iznajmljivanje u okviru kojeg se nalazi ova stavka. */
     private Iznajmljivanje iznajmljivanje;
 
-    public StavkaIznajmljivanja() {
-    }
 
+    /**
+     * Konstruktor koji inicijalizuje sve atribute stavke iznajmljivanja ukljucujuci i ID.
+     * Cena i iznos se automatski izracunavaju - ako je brojDana veci od 0, koristi
+     * se cena po danu i racuna iznos za brojDana, inace se koristi cena po satu
+     * i racuna iznos za brojSati.
+     *
+     * @param bicikla iznajmljena bicikla
+     * @param idStavkaIznajmljivanja jedinstveni identifikator stavke
+     * @param iznos ukupan iznos stavke (bice prepisan izracunatom vrednoscu)
+     * @param cena cena stavke (bice prepisana izracunatom vrednoscu)
+     * @param vremeOd vreme od kada je bicikla iznajmljena
+     * @param vremeDo vreme do kada je bicikla iznajmljena
+     * @param brojSati broj sati iznajmljivanja
+     * @param brojDana broj dana iznajmljivanja
+     * @param iznajmljivanje iznajmljivanje kojem stavka pripada
+     */
     public StavkaIznajmljivanja(Bicikla bicikla, int idStavkaIznajmljivanja, double iznos, double cena,
             LocalDateTime vremeOd, LocalDateTime vremeDo, int brojSati, int brojDana,
             Iznajmljivanje iznajmljivanje) {
@@ -45,6 +92,21 @@ public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializ
         }
     }
 
+    /**
+     * Konstruktor koji inicijalizuje atribute stavke iznajmljivanja bez ID-a.
+     * Koristi se prilikom kreiranja nove stavke pre unosa u bazu podataka.
+     * Cena i iznos se automatski izracunavaju na isti nacin kao u
+     * {@link #StavkaIznajmljivanja(Bicikla, int, double, double, LocalDateTime, LocalDateTime, int, int, Iznajmljivanje)}.
+     *
+     * @param bicikla iznajmljena bicikla
+     * @param iznos ukupan iznos stavke (bice prepisan izracunatom vrednoscu)
+     * @param cena cena stavke (bice prepisana izracunatom vrednoscu)
+     * @param vremeOd vreme od kada je bicikla iznajmljena
+     * @param vremeDo vreme do kada je bicikla iznajmljena
+     * @param brojSati broj sati iznajmljivanja
+     * @param brojDana broj dana iznajmljivanja
+     * @param iznajmljivanje iznajmljivanje kojem stavka pripada
+     */
     public StavkaIznajmljivanja(Bicikla bicikla, double iznos, double cena,
             LocalDateTime vremeOd, LocalDateTime vremeDo, int brojSati, int brojDana,
             Iznajmljivanje iznajmljivanje) {
@@ -66,25 +128,12 @@ public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializ
         }
     }
 
-    public Bicikla getBicikla() { return bicikla; }
-    public void setBicikla(Bicikla bicikla) { this.bicikla = bicikla; }
-    public Iznajmljivanje getIznajmljivanje() { return iznajmljivanje; }
-    public void setIznajmljivanje(Iznajmljivanje iznajmljivanje) { this.iznajmljivanje = iznajmljivanje; }
-    public int getIdStavkaIznajmljivanja() { return idStavkaIznajmljivanja; }
-    public void setIdStavkaIznajmljivanja(int idStavkaIznajmljivanja) { this.idStavkaIznajmljivanja = idStavkaIznajmljivanja; }
-    public double getIznos() { return iznos; }
-    public void setIznos(double iznos) { this.iznos = iznos; }
-    public double getCena() { return cena; }
-    public void setCena(double cena) { this.cena = cena; }
-    public LocalDateTime getVremeOd() { return vremeOd; }
-    public void setVremeOd(LocalDateTime vremeOd) { this.vremeOd = vremeOd; }
-    public LocalDateTime getVremeDo() { return vremeDo; }
-    public void setVremeDo(LocalDateTime vremeDo) { this.vremeDo = vremeDo; }
-    public int getBrojSati() { return brojSati; }
-    public void setBrojSati(int brojSati) { this.brojSati = brojSati; }
-    public int getBrojDana() { return brojDana; }
-    public void setBrojDana(int brojDana) { this.brojDana = brojDana; }
-
+    /**
+     * Vraca tekstualnu reprezentaciju stavke iznajmljivanja sa svim atributima.
+     * Za iznajmljivanje i biciklu se prikazuje samo njihov identifikator.
+     *
+     * @return string sa svim atributima stavke
+     */
     @Override
     public String toString() {
         return "StavkaIznajmljivanja{idStavkaIznajmljivanja=" + idStavkaIznajmljivanja
@@ -114,11 +163,26 @@ public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializ
         return null;
     }
 
+    /**
+     * Vraca naziv tabele "stavkaiznajmljivanja" u bazi podataka.
+     *
+     * @return naziv tabele "stavkaiznajmljivanja"
+     */
     @Override
     public String vratiNazivTabele() {
         return "stavkaiznajmljivanja";
     }
 
+    /**
+     * Vraca listu stavki iznajmljivanja kreiranih na osnovu podataka iz ResultSet-a.
+     * Svaka stavka se kreira sa iznajmljivanjem postavljenim na null - polje
+     * iznajmljivanje se postavlja posebno od strane pozivajuceg koda.
+     *
+     * @param rs ResultSet objekat koji sadrzi podatke iz baze
+     * @return lista stavki iznajmljivanja kreiranih iz ResultSet-a, ili null
+     *         ako dodje do greske pri citanju podataka
+     * @throws Exception ako dodje do greske pri citanju podataka iz ResultSet-a
+     */
     @Override
     public List<ApstraktniDomenskiObjekat> vratiListu(ResultSet rs) throws Exception {
         try {
@@ -146,6 +210,15 @@ public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializ
         }
     }
 
+    /**
+     * Vraca jednu stavku iznajmljivanja kreiranu na osnovu podataka iz ResultSet-a,
+     * zajedno sa kompletnim iznajmljivanjem (kupcem i prodavcem) kojem pripada.
+     *
+     * @param rs ResultSet objekat koji sadrzi podatke iz baze
+     * @return objekat stavke iznajmljivanja kreiran iz ResultSet-a, ili null
+     *         ako dodje do greske pri citanju podataka
+     * @throws Exception ako dodje do greske pri citanju podataka iz ResultSet-a
+     */
     @Override
     public ApstraktniDomenskiObjekat vratiObjekatIzRS(ResultSet rs) throws Exception {
         try {
