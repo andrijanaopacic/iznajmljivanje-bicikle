@@ -12,18 +12,37 @@ import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
+ * Sistemska operacija za izmenu termina dezurstva.
+ * Pre izmene proverava da li vec postoji termin sa istim nazivom.
+ * Izmena se vrsi samo ako ne postoji duplikat.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Termin
  */
 public class PromeniTerminSO extends ApstraktnaGenerickaOperacija{
 
+	/** Indikator da li je izmena termina uspesno izvrsena. */
     private boolean uspesno = false;
+    
+    /** Indikator da li termin sa istim nazivom vec postoji. */
     private boolean postoji = false;
 
+    /**
+     * Vraca informaciju o uspesnosti izmene termina.
+     *
+     * @return true ako je termin uspesno izmenjen, false u suprotnom
+     */
     public boolean getUspesno() {
         return uspesno;
     }
     
+    /**
+     * Proverava da li je prosledjeni objekat odgovarajuceg tipa
+     * i da li vec postoji termin sa istim nazivom u bazi.
+     *
+     * @param objekat objekat tipa {@link Termin} koji se proverava
+     * @throws Exception ako objekat nije odgovarajuceg tipa ili dodje do greske pri radu sa bazom
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Termin)) {
@@ -46,6 +65,13 @@ public class PromeniTerminSO extends ApstraktnaGenerickaOperacija{
 
     }
 
+    /**
+     * Menja podatke termina ukoliko ne postoji termin sa istim nazivom.
+     *
+     * @param objekat objekat tipa {@link Termin} koji se menja
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske prilikom izmene
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {
