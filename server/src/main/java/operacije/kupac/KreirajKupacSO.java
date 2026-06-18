@@ -12,17 +12,39 @@ import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
+ * Sistemska operacija za kreiranje novog kupca.
+ * Validira osnovne podatke kupca i proverava da li kupac sa istim podacima
+ * vec postoji u bazi.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Kupac
  */
 public class KreirajKupacSO extends ApstraktnaGenerickaOperacija {
+	
+	 /** Indikator uspesnosti kreiranja kupca. */
     private boolean uspesno = false;
+    
+    /** Indikator da li kupac sa istim podacima vec postoji u bazi podataka. */
     private boolean postoji = false;
 
+    /**
+     * Vraca indikator uspesnosti kreiranja kupca.
+     *
+     * @return true ako je kupac uspesno kreiran, false inace
+     */
     public boolean getUspesno() {
         return uspesno;
     }
 
+    /**
+     * Validira ime, prezime i broj licne karte kupca (mora imati 9 cifara),
+     * i proverava da li kupac sa istim podacima vec postoji u bazi.
+     *
+     * @param parametar objekat tipa {@link Kupac} koji se kreira
+     * @throws Exception ako parametar nije odgovarajuceg tipa, ili ako
+     *         podaci nisu validni
+     * @throws SQLException ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void preduslovi(Object parametar) throws Exception {
 
@@ -61,7 +83,13 @@ public class KreirajKupacSO extends ApstraktnaGenerickaOperacija {
 
     }
 
-
+    /**
+     * Dodaje kupca u bazu preko brokera, samo ako ne postoji vec.
+     *
+     * @param objekat objekat tipa {@link Kupac} koji se kreira
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {

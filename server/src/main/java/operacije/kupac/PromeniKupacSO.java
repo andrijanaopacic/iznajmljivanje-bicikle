@@ -12,18 +12,39 @@ import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
+ * Sistemska operacija za izmenu postojeceg kupca.
+ * Pre izmene proverava da li kupac sa istim podacima (ime, prezime,
+ * broj licne karte i mesto) vec postoji u bazi.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Kupac
  */
 public class PromeniKupacSO extends ApstraktnaGenerickaOperacija{
 
+	/** Indikator uspesnosti izmene kupca. */
     private boolean uspesno = false;
+    
+    /** Indikator da li kupac sa istim podacima vec postoji u bazi podataka. */
     private boolean postoji = false;
 
+    /**
+     * Vraca indikator uspesnosti izmene kupca.
+     *
+     * @return true ako je kupac uspesno izmenjen, false inace
+     */
     public boolean getUspesno() {
         return uspesno;
     }
     
+    /**
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa i
+     * da li kupac sa istim podacima (ime, prezime, broj licne karte
+     * i mesto) vec postoji u bazi.
+     *
+     * @param objekat objekat tipa {@link Kupac} koji se izmenjuje
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws SQLException ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
          if (objekat == null || !(objekat instanceof Kupac)) {
@@ -46,6 +67,13 @@ public class PromeniKupacSO extends ApstraktnaGenerickaOperacija{
         }
     }
 
+    /**
+     * Azurira kupca preko brokera, samo ako ne postoji drugi kupac sa istim podacima.
+     *
+     * @param objekat objekat tipa {@link Kupac} koji se izmenjuje
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {
