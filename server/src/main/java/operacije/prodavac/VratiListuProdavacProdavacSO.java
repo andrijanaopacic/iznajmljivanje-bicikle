@@ -9,17 +9,32 @@ import model.Prodavac;
 import operacije.ApstraktnaGenerickaOperacija;
 
 /**
+ * Sistemska operacija za vracanje liste prodavaca prema imenu i prezimenu.
+ * Omogucava pretragu prodavaca unosom imena, prezimena ili njihove kombinacije.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Prodavac
  */
 public class VratiListuProdavacProdavacSO extends ApstraktnaGenerickaOperacija{
 
+	/** Lista prodavaca koji odgovaraju kriterijumu pretrage. */
     private List<Prodavac> lista;
 
+    /**
+     * Vraca listu prodavaca dobijenu nakon izvrsavanja operacije.
+     *
+     * @return lista prodavaca koji odgovaraju zadatoj pretrazi
+     */
     public List<Prodavac> getLista() {
         return lista;
     }
     
+    /**
+     * Proverava da li je prosledjeni objekat odgovarajuceg tipa.
+     *
+     * @param objekat objekat tipa {@link Prodavac} koji se koristi za pretragu
+     * @throws Exception ako objekat nije odgovarajuceg tipa
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Prodavac)) {
@@ -27,6 +42,15 @@ public class VratiListuProdavacProdavacSO extends ApstraktnaGenerickaOperacija{
         }
 
     }
+    
+    /**
+     * Izvrsava pretragu prodavaca prema unetom imenu i prezimenu.
+     * Formira upit na osnovu unetog teksta i vraca listu odgovarajucih prodavaca.
+     *
+     * @param objekat objekat tipa {@link Prodavac} koji predstavlja osnovu za pretragu
+     * @param kljuc tekst po kome se vrsi pretraga prodavca
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         String[] imePrezime = ((String) kljuc).strip().split(" ");

@@ -14,18 +14,37 @@ import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
+ * Sistemska operacija za izmenu podataka o prodavcu.
+ * Pre izmene proverava da li vec postoji prodavac sa istim podacima i istim terminima.
+ * Ukoliko ne postoji, vrsi izmenu prodavca i azurira njegove termine.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Prodavac
  */
 public class PromeniProdavacSO extends ApstraktnaGenerickaOperacija {
     
+	 /** Indikator da li je izmena prodavca uspesno izvrsena. */
     private boolean uspesno = false;
+    
+    /** Indikator da li prodavac sa istim podacima vec postoji. */
     private boolean postoji = false;
 
+    /**
+     * Vraca informaciju o uspesnosti izmene prodavca.
+     *
+     * @return true ako je prodavac uspesno izmenjen, false u suprotnom
+     */
     public boolean getUspesno() {
         return uspesno;
     }
 
+    /**
+     * Proverava da li je prosledjeni objekat odgovarajuceg tipa.
+     * Takodje proverava da li vec postoji prodavac sa istim podacima i istim dodeljenim terminima.
+     *
+     * @param objekat objekat tipa {@link Prodavac} koji se proverava
+     * @throws Exception ako objekat nije odgovarajuceg tipa ili dodje do greske pri radu sa bazom
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Prodavac)) {
@@ -59,6 +78,14 @@ public class PromeniProdavacSO extends ApstraktnaGenerickaOperacija {
 
     }
 
+    /**
+     * Menja podatke prodavca ukoliko ne postoji duplikat.
+     * Nakon izmene podataka brisu se stari termini prodavca i dodaju novi.
+     *
+     * @param objekat objekat tipa {@link Prodavac} koji se menja
+     * @param kljuc dodatni parametar operacije
+     * @throws Exception ako dodje do greske prilikom izmene
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {

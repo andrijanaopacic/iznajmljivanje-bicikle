@@ -12,18 +12,37 @@ import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
+ * Sistemska operacija za kreiranje novog prodavca.
+ * Pre dodavanja prodavca u bazu proverava da li prodavac sa istim podacima vec postoji.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Prodavac
  */
 public class KreirajProdavacSO extends ApstraktnaGenerickaOperacija {
 
+	 /** Indikator da li je prodavac uspesno kreiran. */
     private boolean uspesno = false;
+    
+    /** Indikator da li prodavac sa prosledjenim podacima vec postoji. */
     private boolean postoji = false;
 
+    /**
+     * Vraca informaciju o uspesnosti kreiranja prodavca.
+     *
+     * @return true ako je prodavac uspesno dodat, false incae
+     */
     public boolean getUspesno() {
         return uspesno;
     }
     
+    /**
+     * Proverava da li je prosledjen objekat odgovarajuceg tipa i proverava da li
+     * prodavac vec postoji u bazi podataka na osnovu imena, prezimena,
+     * korisnickog imena i šifre.
+     *
+     * @param objekat objekat tipa {@link Prodavac} koji se proverava
+     * @throws Exception ako objekat nije odgovarajuceg tipa ili dođe do greske pri radu sa bazom
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Prodavac)) {
@@ -44,6 +63,13 @@ public class KreirajProdavacSO extends ApstraktnaGenerickaOperacija {
         }
     }
 
+    /**
+     * Kreira novog prodavca ukoliko prodavac sa istim podacima ne postoji.
+     *
+     * @param objekat objekat tipa {@link Prodavac} koji se dodaje
+     * @param kljuc dodatni parametar operacije
+     * @throws Exception ako dodje do greske prilikom dodavanja
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {
