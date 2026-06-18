@@ -200,4 +200,30 @@ class KupacTest {
 
         assertNull(result);
     }
+    
+    @Test
+    void testPodrazumevaniKonstruktor() {
+        assertNotNull(k);
+    }
+
+    @Test
+    void testKonstruktorSaId() {
+        Mesto mesto = new Mesto(1, "Beograd");
+        Kupac noviKupac = new Kupac(1, "Marko", "Markovic", "123456", mesto);
+        assertEquals(1, noviKupac.getIdKupac());
+        assertEquals("Marko", noviKupac.getIme());
+        assertEquals("Markovic", noviKupac.getPrezime());
+        assertEquals("123456", noviKupac.getBrojLicneKarte());
+        assertEquals(mesto, noviKupac.getMesto());
+    }
+
+    @Test
+    void testKonstruktorBezId() {
+        Mesto mesto = new Mesto(1, "Beograd");
+        Kupac noviKupac = new Kupac("Marko", "Markovic", "123456", mesto);
+        assertEquals("Marko", noviKupac.getIme());
+        assertEquals("Markovic", noviKupac.getPrezime());
+        assertEquals("123456", noviKupac.getBrojLicneKarte());
+        assertEquals(mesto, noviKupac.getMesto());
+    }
 }

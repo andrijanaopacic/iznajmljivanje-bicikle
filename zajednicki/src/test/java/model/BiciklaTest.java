@@ -117,4 +117,9 @@ abstract class BiciklaTest {
         b.setBoja("Crvena");
         assertEquals("cenaPoSatu=500.0, cenaPoDanu=2000.0, marka='Trek', model='Marlin', boja='Crvena'", b.vratiVrednostiZaIzmenu());
     }
+    
+    @Test
+    void testPodrazumevaniKonstruktor() {
+        assertNotNull(b);
+    }
 }

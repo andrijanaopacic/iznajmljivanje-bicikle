@@ -43,6 +43,23 @@ class IznajmljivanjeTest {
     }
 
     @Test
+    void testPodrazumevaniKonstruktor() {
+        assertNotNull(i);
+    }
+
+    @Test
+    void testKonstruktorSaSvimParametrima() {
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        Iznajmljivanje noviIznajmljivanje = new Iznajmljivanje(1, 5000.0, stavke, kupac, prodavac);
+
+        assertEquals(1, noviIznajmljivanje.getIdIznajmljivanje());
+        assertEquals(5000.0, noviIznajmljivanje.getUkupanIznos());
+        assertEquals(stavke, noviIznajmljivanje.getListaStavkiIznajmljivanja());
+        assertEquals(kupac, noviIznajmljivanje.getKupac());
+        assertEquals(prodavac, noviIznajmljivanje.getProdavac());
+    }
+
+    @Test
     void testSetIdIznajmljivanje() {
         i.setIdIznajmljivanje(1);
         assertEquals(1, i.getIdIznajmljivanje());

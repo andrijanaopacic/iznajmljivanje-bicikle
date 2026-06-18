@@ -34,6 +34,24 @@ class MestoTest {
         m = null;
         closeable.close();
     }
+    
+    @Test
+    void testPodrazumevaniKonstruktor() {
+        assertNotNull(m);
+    }
+
+    @Test
+    void testKonstruktorSaId() {
+        Mesto noviMesto = new Mesto(1, "Beograd");
+        assertEquals(1, noviMesto.getIdMesto());
+        assertEquals("Beograd", noviMesto.getNaziv());
+    }
+
+    @Test
+    void testKonstruktorBezId() {
+        Mesto noviMesto = new Mesto("Beograd");
+        assertEquals("Beograd", noviMesto.getNaziv());
+    }
 
     @Test
     void testSetIdMesto() {

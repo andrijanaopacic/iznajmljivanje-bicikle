@@ -43,6 +43,11 @@ class StavkaIznajmljivanjaTest {
     }
 
     @Test
+    void testPodrazumevaniKonstruktor() {
+        assertNotNull(stavka);
+    }
+
+    @Test
     void testSetIdStavkaIznajmljivanja() {
         stavka.setIdStavkaIznajmljivanja(1);
         assertEquals(1, stavka.getIdStavkaIznajmljivanja());
@@ -137,13 +142,34 @@ class StavkaIznajmljivanjaTest {
     }
 
     @Test
+    void testKonstruktorBezIdBrojSati() {
+        bicikla.setIdBicikla(1);
+        bicikla.setCenaPoSatu(500.0);
+        bicikla.setCenaPoDanu(2000.0);
+        iznajmljivanje.setIdIznajmljivanje(1);
+
+        LocalDateTime vremeOd = LocalDateTime.of(2025, 10, 10, 10, 0, 0);
+        LocalDateTime vremeDo = LocalDateTime.of(2025, 10, 10, 12, 0, 0);
+
+        StavkaIznajmljivanja s = new StavkaIznajmljivanja(bicikla, 0, 0, vremeOd, vremeDo, 2, 0, iznajmljivanje);
+
+        assertEquals(0, s.getIdStavkaIznajmljivanja());
+        assertEquals(500.0, s.getCena());
+        assertEquals(1000.0, s.getIznos());
+        assertEquals(2, s.getBrojSati());
+        assertEquals(0, s.getBrojDana());
+        assertEquals(bicikla, s.getBicikla());
+        assertEquals(iznajmljivanje, s.getIznajmljivanje());
+    }
+
+    @Test
     void testVratiNazivTabele() {
         assertEquals("stavkaiznajmljivanja", stavka.vratiNazivTabele());
     }
 
     @Test
     void testVratiKoloneZaUbacivanje() {
-        assertEquals("iznos,cena,vremeOd,vremeDo,brojSati,brojDana,idBicikla,idIznajmljivanje",stavka.vratiKoloneZaUbacivanje());
+        assertEquals("iznos,cena,vremeOd,vremeDo,brojSati,brojDana,idBicikla,idIznajmljivanje", stavka.vratiKoloneZaUbacivanje());
     }
 
     @Test
@@ -163,7 +189,7 @@ class StavkaIznajmljivanjaTest {
         stavka.setBicikla(bicikla);
         stavka.setIznajmljivanje(iznajmljivanje);
 
-        assertEquals("1000.0,500.0,'" + Timestamp.valueOf(vremeOd) + "','"  + Timestamp.valueOf(vremeDo) + "',2,0,1,1", stavka.vratiVrednostiZaUbacivanje());
+        assertEquals("1000.0,500.0,'" + Timestamp.valueOf(vremeOd) + "','" + Timestamp.valueOf(vremeDo) + "',2,0,1,1", stavka.vratiVrednostiZaUbacivanje());
     }
 
     @Test
@@ -190,7 +216,7 @@ class StavkaIznajmljivanjaTest {
         stavka.setBrojDana(0);
         stavka.setBicikla(bicikla);
 
-        assertEquals("iznos=1000.0, cena=500.0, vremeOd='" + Timestamp.valueOf(vremeOd)  + "', vremeDo='" + Timestamp.valueOf(vremeDo)  + "', brojSati=2, brojDana=0, idBicikla=1",  stavka.vratiVrednostiZaIzmenu());
+        assertEquals("iznos=1000.0, cena=500.0, vremeOd='" + Timestamp.valueOf(vremeOd) + "', vremeDo='" + Timestamp.valueOf(vremeDo) + "', brojSati=2, brojDana=0, idBicikla=1", stavka.vratiVrednostiZaIzmenu());
     }
 
     @Test
