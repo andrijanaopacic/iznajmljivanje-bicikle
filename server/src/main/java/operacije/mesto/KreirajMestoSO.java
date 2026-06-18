@@ -74,7 +74,7 @@ public class KreirajMestoSO extends ApstraktnaGenerickaOperacija{
      *
      * @param objekat objekat tipa {@link Mesto} koji se kreira
      * @param kljuc nije koriscen u ovoj operaciji
-     * @
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
      */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
