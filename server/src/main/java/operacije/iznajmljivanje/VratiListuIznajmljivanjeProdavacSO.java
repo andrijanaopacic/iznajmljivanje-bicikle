@@ -5,14 +5,34 @@ import model.Iznajmljivanje;
 import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
 
+/**
+ * Sistemska operacija za vracanje liste iznajmljivanja na osnovu imena
+ * i/ili prezimena prodavca.
+ *
+ * @author Andrijana Opacic
+ * @see Iznajmljivanje
+ */
 public class VratiListuIznajmljivanjeProdavacSO extends ApstraktnaGenerickaOperacija {
 
+	/** Lista iznajmljivanja koja odgovaraju zadatom imenu i/ili prezimenu prodavca. */
     private List<Iznajmljivanje> lista;
 
+    /**
+     * Vraca listu iznajmljivanja dobijenu nakon izvrsavanja operacije.
+     *
+     * @return lista iznajmljivanja, sa popunjenim listama stavki
+     */
     public List<Iznajmljivanje> getLista() {
         return lista;
     }
 
+    /**
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koji se koristi
+     *        kao osnova za pretragu
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Iznajmljivanje)) {
@@ -20,6 +40,16 @@ public class VratiListuIznajmljivanjeProdavacSO extends ApstraktnaGenerickaOpera
         }
     }
 
+    /**
+     * Filtrira iznajmljivanja po imenu i/ili prezimenu prodavca (kljuc).
+     * Ako kljuc sadrzi dve reci, uzima u obzir oba redosleda ime-prezime.
+     * Za svako pronadjeno iznajmljivanje ucitava i njegove stavke.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koji se koristi
+     *        kao osnova za pretragu
+     * @param kljuc ime i/ili prezime prodavca (tipa String) po kome se filtrira
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         String[] imePrezime = ((String) kljuc).strip().split(" ");

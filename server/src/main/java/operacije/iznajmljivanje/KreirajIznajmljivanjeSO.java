@@ -9,15 +9,47 @@ import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
+/**
+ * Sistemska operacija za kreiranje novog iznajmljivanja zajedno sa svim
+ * njegovim stavkama. Pre kreiranja proverava da li identicno iznajmljivanje
+ * (sa istim ukupnim iznosom, prodavcem, kupcem i istim stavkama) vec
+ * postoji u bazi podataka. Nakon uspesnog kreiranja, automatski generise
+ * i JSON racun za novokreirano iznajmljivanje.
+ *
+ * @author Andrijana Opacic
+ * @see Iznajmljivanje
+ * @see StavkaIznajmljivanja
+ * @see GenerisiRacunSO
+ */
 public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
 
+	/** Indikator uspesnosti kreiranja iznajmljivanja. */
     private boolean uspesno = false;
+    
+    /** Indikator da li identicno iznajmljivanje vec postoji u bazi podataka. */
     private boolean postoji = false;
 
+    /**
+     * Vraca indikator uspesnosti kreiranja iznajmljivanja.
+     *
+     * @return true ako je iznajmljivanje uspesno kreirano, false inace
+     */
     public boolean getUspesno() {
         return uspesno;
     }
 
+    /**
+     * Proverava preduslove pre kreiranja iznajmljivanja.
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa i da li
+     * identicno iznajmljivanje (sa istim ukupnim iznosom, prodavcem, kupcem
+     * i istim brojem podudarajucih stavki) vec postoji u bazi podataka.
+     * Iznajmljivanje se smatra postojecim samo ako se broj podudarajucih
+     * stavki poklapa sa ukupnim brojem stavki prosledjenog iznajmljivanja.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koje se kreira
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws SQLException ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Iznajmljivanje)) {
@@ -75,6 +107,19 @@ public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
         }
     }
 
+    /**
+     * Izvrsava kreiranje iznajmljivanja u bazi podataka.
+     * Iznajmljivanje se kreira samo ako ne postoji u bazi podataka. Nakon
+     * dodavanja iznajmljivanja, preuzima se automatski generisani ID i
+     * koristi se da se sve stavke iznajmljivanja povezu sa njim i upisu u
+     * bazu. Na kraju se pokusava generisati JSON racun za novokreirano
+     * iznajmljivanje; ukoliko generisanje racuna ne uspe, greska se samo
+     * zapisuje u konzolu i ne prekida izvrsavanje operacije.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koje se kreira
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {
