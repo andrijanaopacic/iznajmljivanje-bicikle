@@ -6,14 +6,36 @@ import model.Iznajmljivanje;
 import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
 
+/**
+ * Sistemska operacija za vracanje liste svih iznajmljivanja u kojima je
+ * koriscena konkretna bicikla. Bicikla na osnovu koje se filtrira
+ * iznajmljivanja se prosledjuje kao kljuc.
+ *
+ * @author Andrijana Opacic
+ * @see Iznajmljivanje
+ * @see Bicikla
+ */
 public class VratiListuIznajmljivanjeBiciklaSO extends ApstraktnaGenerickaOperacija {
 
+	 /** Lista iznajmljivanja u kojima je koriscena zadata bicikla. */
     private List<Iznajmljivanje> lista;
 
+    /**
+     * Vraca listu iznajmljivanja u kojima je koriscena zadata bicikla.
+     *
+     * @return lista iznajmljivanja, sa popunjenim listama stavki
+     */
     public List<Iznajmljivanje> getLista() {
         return lista;
     }
 
+    /**
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koji se koristi
+     *        kao osnova za pretragu
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Iznajmljivanje)) {
@@ -21,6 +43,18 @@ public class VratiListuIznajmljivanjeBiciklaSO extends ApstraktnaGenerickaOperac
         }
     }
 
+    /**
+     * Izvrsava vracanje liste svih iznajmljivanja koja sadrze stavku sa
+     * zadatom biciklom (prosledjenom kao kljuc), zajedno sa podacima o
+     * prodavcu, kupcu i mestu. Za svako pronadjeno iznajmljivanje, ucitavaju
+     * se i sve njegove stavke, vodeci racuna o svim mogucim tipovima bicikle.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koji se koristi
+     *        kao osnova za pretragu
+     * @param kljuc objekat tipa {@link Bicikla} na osnovu kog se filtriraju
+     *        iznajmljivanja
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         Bicikla biciklaUslov = (Bicikla) kljuc;

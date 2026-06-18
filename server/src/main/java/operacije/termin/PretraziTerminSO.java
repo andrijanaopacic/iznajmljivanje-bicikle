@@ -8,18 +8,32 @@ import model.Termin;
 import operacije.ApstraktnaGenerickaOperacija;
 
 /**
+ * Sistemska operacija za pretragu termina dezurstva po identifikatoru.
+ * Vraca jedan termin na osnovu prosledjenog ID-a.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Termin
  */
 public class PretraziTerminSO extends ApstraktnaGenerickaOperacija{
 
+	/** Pronadjeni termin nakon izvrsavanja operacije. */
     private Termin termin;
 
+    /**
+     * Vraca pronadjeni termin.
+     *
+     * @return objekat tipa {@link Termin} ako postoji, inace null
+     */
     public Termin getTermin() {
         return termin;
     }
     
-    
+    /**
+     * Proverava da li je prosledjeni objekat odgovarajuceg tipa.
+     *
+     * @param objekat objekat tipa {@link Termin} koji se koristi za pretragu
+     * @throws Exception ako objekat nije odgovarajuceg tipa
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Termin)) {
@@ -27,7 +41,14 @@ public class PretraziTerminSO extends ApstraktnaGenerickaOperacija{
         }
     }
 
-
+    /**
+     * Pretrazuje termin dezurstva po njegovom identifikatoru.
+     * Rezultat se cuva u atributu termin.
+     *
+     * @param objekat objekat tipa {@link Termin} koji sadrzi kriterijum pretrage
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         String upit = " WHERE idTerminDezurstva = " + ((Termin) objekat).getIdTerminDezurstva();

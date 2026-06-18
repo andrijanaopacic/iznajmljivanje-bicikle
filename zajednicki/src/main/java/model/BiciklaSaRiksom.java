@@ -5,45 +5,93 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Predstavlja biciklu sa riksom koja se moze iznajmiti za prevoz vise osoba ili tereta.
+ * Pored zajednickih atributa nasledjenih od {@link Bicikla}, dodaje specificne atribute
+ * koji se cuvaju u podtabeli "biciklasariksom".
+ *
+ * @author Andrijana Opacic
+ * @see Bicikla
+ */
+@Getter
+@Setter
+@NoArgsConstructor
 public class BiciklaSaRiksom extends Bicikla {
 
+	/** Broj sedista na riksi. */
     private int brojSedista;
+    
+    /** Tip rikse, npr. "decija", "zatvorena" ili "otvorena". */
     private String tipRikse;
+    
+    /** Maksimalna nosivost rikse u kilogramima. */
     private int maxNosivost;
 
-    public BiciklaSaRiksom() {
-    }
 
-    public BiciklaSaRiksom(int idBicikla, double cenaPoSatu, double cenaPoDanu,
-            String marka, String model, String boja,
-            int brojSedista, String tipRikse, int maxNosivost) {
+    /**
+     * Konstruktor koji inicijalizuje sve atribute bicikle sa riksom ukljucujuci i ID.
+     *
+     * @param idBicikla jedinstveni identifikator bicikle
+     * @param cenaPoSatu cena iznajmljivanja po satu
+     * @param cenaPoDanu cena iznajmljivanja po danu
+     * @param marka marka bicikle
+     * @param model model bicikle
+     * @param boja boja bicikle
+     * @param brojSedista broj sedista na riksi
+     * @param tipRikse tip rikse
+     * @param maxNosivost maksimalna nosivost rikse u kilogramima
+     */
+    public BiciklaSaRiksom(int idBicikla, double cenaPoSatu, double cenaPoDanu, String marka, String model, String boja, int brojSedista, String tipRikse, int maxNosivost) {
         super(idBicikla, cenaPoSatu, cenaPoDanu, marka, model, boja);
         this.brojSedista = brojSedista;
         this.tipRikse = tipRikse;
         this.maxNosivost = maxNosivost;
     }
 
-    public BiciklaSaRiksom(double cenaPoSatu, double cenaPoDanu,
-            String marka, String model, String boja,
-            int brojSedista, String tipRikse, int maxNosivost) {
+    /**
+     * Konstruktor koji inicijalizuje atribute bicikle sa riksom bez ID-a.
+     * Koristi se prilikom kreiranja nove bicikle pre unosa u bazu podataka.
+     *
+     * @param cenaPoSatu cena iznajmljivanja po satu
+     * @param cenaPoDanu cena iznajmljivanja po danu
+     * @param marka marka bicikle
+     * @param model model bicikle
+     * @param boja boja bicikle
+     * @param brojSedista broj sedista na riksi
+     * @param tipRikse tip rikse
+     * @param maxNosivost maksimalna nosivost rikse u kilogramima
+     */
+    public BiciklaSaRiksom(double cenaPoSatu, double cenaPoDanu, String marka, String model, String boja, int brojSedista, String tipRikse, int maxNosivost) {
         super(cenaPoSatu, cenaPoDanu, marka, model, boja);
         this.brojSedista = brojSedista;
         this.tipRikse = tipRikse;
         this.maxNosivost = maxNosivost;
     }
 
-    public int getBrojSedista() { return brojSedista; }
-    public void setBrojSedista(int brojSedista) { this.brojSedista = brojSedista; }
-    public String getTipRikse() { return tipRikse; }
-    public void setTipRikse(String tipRikse) { this.tipRikse = tipRikse; }
-    public int getMaxNosivost() { return maxNosivost; }
-    public void setMaxNosivost(int maxNosivost) { this.maxNosivost = maxNosivost; }
 
+    /**
+     * Vraca tekstualnu reprezentaciju tipa bicikle.
+     *
+     * @return string "Bicikla sa riksom"
+     */
     @Override
     public String toString() {
         return "Bicikla sa riksom";
     }
 
+    /**
+     * Poredi ovu biciklu sa riksom sa drugim objektom.
+     * Bicikle su jednake ako su istog konkretnog tipa i imaju isti idBicikla,
+     * sto se proverava delegiranjem na {@link Bicikla#equals(Object)}.
+     *
+     * @param obj objekat sa kojim se poredi
+     * @return true ako su bicikle istog tipa i imaju isti idBicikla, false ako je
+     *         obj null, ako je obj drugog konkretnog tipa, ili ako se idBicikla razlikuju
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -52,6 +100,11 @@ public class BiciklaSaRiksom extends Bicikla {
         return super.equals(obj);
     }
 
+    /**
+     * Vraca hash kod bicikle sa riksom racunat na osnovu jedinstvenog identifikatora.
+     *
+     * @return hash kod bicikle
+     */
     @Override
     public int hashCode() {
         return Objects.hash(getIdBicikla());
@@ -62,6 +115,13 @@ public class BiciklaSaRiksom extends Bicikla {
         return "biciklasariksom";
     }
 
+    /**
+     * Vraca JOIN izraz koji spaja tabelu "bicikla" sa podtabelom "biciklasariksom".
+     * Koristi se prilikom SELECT upita kako bi se ucitali i zajednicki i
+     * specificni atributi bicikle sa riksom.
+     *
+     * @return JOIN izraz za bicikle sa riksom
+     */
     @Override
     public String vratiNazivTabele() {
         return "bicikla JOIN biciklasariksom ON bicikla.idBicikla = biciklasariksom.idBicikla";
@@ -152,7 +212,6 @@ public class BiciklaSaRiksom extends Bicikla {
         int brojSedista = rs.getInt("biciklasariksom.brojSedista");
         String tipRikse = rs.getString("biciklasariksom.tipRikse");
         int maxNosivost = rs.getInt("biciklasariksom.maxNosivost");
-        return new BiciklaSaRiksom(id, cenaPoSatu, cenaPoDanu,
-                marka, model, boja, brojSedista, tipRikse, maxNosivost);
+        return new BiciklaSaRiksom(id, cenaPoSatu, cenaPoDanu, marka, model, boja, brojSedista, tipRikse, maxNosivost);
     }
 }

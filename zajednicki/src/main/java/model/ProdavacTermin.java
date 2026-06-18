@@ -12,20 +12,44 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
+ * Predstavlja dezurstvo prodavca u odredjenom terminu i na odredjeni datum.
+ * Povezuje {@link Prodavac} i {@link Termin} sa konkretnim datumom i smenom dezurstva.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Prodavac
+ * @see Termin
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class ProdavacTermin implements ApstraktniDomenskiObjekat,Serializable{
     
+	/** Prodavac koji je dezuran. */
     private Prodavac prodavac;
+    
+    /** Termin u kojem je prodavac dezuran. */
     private Termin termin;
+    
+    /** Datum dezurstva prodavca. */
     private LocalDate datumDezurstva;
+    
+    /** Smena u kojoj je prodavac dezuran. */
     private String smena;
 
-    public ProdavacTermin() {
-    }
 
+    /**
+     * Konstruktor koji inicijalizuje sve atribute dezurstva prodavca.
+     *
+     * @param prodavac prodavac koji je dezuran
+     * @param termin termin u kojem je prodavac dezuran
+     * @param datumDezurstva datum dezurstva
+     * @param smena smena dezurstva
+     */
     public ProdavacTermin(Prodavac prodavac, Termin termin, LocalDate datumDezurstva, String smena) {
         this.prodavac = prodavac;
         this.termin = termin;
@@ -33,77 +57,47 @@ public class ProdavacTermin implements ApstraktniDomenskiObjekat,Serializable{
         this.smena = smena;
     }
 
-    public Prodavac getProdavac() {
-        return prodavac;
-    }
-
-    public void setProdavac(Prodavac prodavac) {
-        this.prodavac = prodavac;
-    }
-
-    public Termin getTermin() {
-        return termin;
-    }
-
-    public void setTermin(Termin termin) {
-        this.termin = termin;
-    }
-
-    
-
-
-    public LocalDate getDatumDezurstva() {
-        return datumDezurstva;
-    }
-
-    public void setDatumDezurstva(LocalDate datumDezurstva) {
-        this.datumDezurstva = datumDezurstva;
-    }
-
-    public String getSmena() {
-        return smena;
-    }
-
-    public void setSmena(String smena) {
-        this.smena = smena;
-    }
-
+    /**
+     * Vraca tekstualnu reprezentaciju dezurstva prodavca sa datumom i smenom.
+     *
+     * @return string sa datumom i smenom dezurstva
+     */
     @Override
     public String toString() {
         return "ProdavacTermin{" + "datumDezurstva=" + datumDezurstva + ", smena=" + smena + '}';
     }
 
+    /**
+     * Vraca naziv tabele "prodavactermin" u bazi podataka.
+     *
+     * @return naziv tabele "prodavactermin"
+     */
     @Override
     public String vratiNazivTabele() {
         return "prodavactermin";
     }
 
     @Override
-public List<ApstraktniDomenskiObjekat> vratiListu(ResultSet rs) throws Exception {
+    public List<ApstraktniDomenskiObjekat> vratiListu(ResultSet rs) throws Exception {
     List<ApstraktniDomenskiObjekat> lista = new ArrayList<>();
 
     while (rs.next()) {
-        // Uzimanje podataka iz ResultSet-a
         int idProdavac = rs.getInt("prodavactermin.idProdavac");
         LocalDate datumDezurstva = rs.getDate("prodavactermin.datumDezurstva").toLocalDate();
         String smena = rs.getString("prodavactermin.smena");
 
-        // Kreiranje objekta Prodavac
         String imeProdavac = rs.getString("prodavac.ime");
         String prezimeProdavac = rs.getString("prodavac.prezime");
         String korisnickoIme = rs.getString("prodavac.korisnickoIme");
         String sifra = rs.getString("prodavac.sifra");
         Prodavac prodavac = new Prodavac(idProdavac, imeProdavac, prezimeProdavac, korisnickoIme, sifra);
 
-        // Kreiranje objekta Termin
         int idTermin = rs.getInt("termin.idTerminDezurstva");
         String nazivTermin = rs.getString("termin.naziv");
         Termin termin = new Termin(idTermin, nazivTermin);
 
-        // Kreiranje objekta ProdavacTermin
         ProdavacTermin pt = new ProdavacTermin(prodavac, termin, datumDezurstva, smena);
 
-        // Dodavanje objekta u listu
         lista.add(pt);
     }
 

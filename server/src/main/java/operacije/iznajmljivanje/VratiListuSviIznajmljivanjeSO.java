@@ -5,14 +5,33 @@ import model.Iznajmljivanje;
 import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
 
+/**
+ * Sistemska operacija za vracanje liste svih iznajmljivanja u sistemu.
+ *
+ * @author Andrijana Opacic
+ * @see Iznajmljivanje
+ */
 public class VratiListuSviIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
 
+	/** Lista svih iznajmljivanja. */
     private List<Iznajmljivanje> lista;
 
+    /**
+     * Vraca listu svih iznajmljivanja dobijenu nakon izvrsavanja operacije.
+     *
+     * @return lista svih iznajmljivanja, sa popunjenim listama stavki
+     */
     public List<Iznajmljivanje> getLista() {
         return lista;
     }
 
+    /**
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koji se koristi
+     *        kao osnova za pretragu
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Iznajmljivanje)) {
@@ -20,6 +39,15 @@ public class VratiListuSviIznajmljivanjeSO extends ApstraktnaGenerickaOperacija 
         }
     }
 
+    /**
+     * Ucitava sva iznajmljivanja zajedno sa podacima o prodavcu, kupcu i
+     * mestu, i za svako ucitava i njegove stavke.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koji se koristi
+     *        kao osnova za pretragu
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         String upit1 = " JOIN prodavac ON prodavac.idProdavac = iznajmljivanje.idProdavac"

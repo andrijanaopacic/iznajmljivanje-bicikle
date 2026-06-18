@@ -9,19 +9,33 @@ import model.Kupac;
 import operacije.ApstraktnaGenerickaOperacija;
 
 /**
+ * Sistemska operacija za vracanje liste kupaca po nazivu mesta.
+ * Ukoliko je naziv mesta prazan, vraca sve kupce.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Kupac
  */
 public class VratiListuKupacMestoSO extends ApstraktnaGenerickaOperacija{
 
+	/** Lista kupaca koji odgovaraju zadatom mestu. */
     private List<Kupac> lista;
 
+    /**
+     * Vraca listu kupaca dobijenu nakon izvrsavanja operacije.
+     *
+     * @return lista kupaca koji odgovaraju zadatoj pretrazi
+     */
     public List<Kupac> getLista() {
         return lista;
     }
     
-    
-    
+    /**
+     * Proverava da li je prosledjeni parametar odgovarajuceg tipa.
+     *
+     * @param objekat objekat tipa {@link Kupac} koji se koristi kao
+     *        osnova za pretragu
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Kupac)) {
@@ -29,6 +43,15 @@ public class VratiListuKupacMestoSO extends ApstraktnaGenerickaOperacija{
         }
     }
 
+    /**
+     * Filtrira kupce po nazivu mesta (kljuc). Ako je naziv mesta prazan,
+     * vraca sve kupce bez filtriranja.
+     *
+     * @param objekat objekat tipa {@link Kupac} koji se koristi kao
+     *        osnova za pretragu
+     * @param kljuc naziv mesta (tipa String) po kome se filtrira
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         String nazivMesta = ((String) kljuc).strip();

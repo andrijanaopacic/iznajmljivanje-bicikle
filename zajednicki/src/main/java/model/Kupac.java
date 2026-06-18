@@ -1,29 +1,52 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
+ * Predstavlja kupca koji moze da iznajmi bicikle.
+ * Sadrzi osnovne podatke o kupcu i mesto u kojem kupac zivi.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Mesto
+ * @see Iznajmljivanje
  */
-public class Kupac implements ApstraktniDomenskiObjekat,Serializable{
-    
+@Getter
+@Setter
+@NoArgsConstructor
+public class Kupac implements ApstraktniDomenskiObjekat, Serializable {
+
+    /** Jedinstveni identifikator kupca u bazi podataka. */
     private int idKupac;
+
+    /** Ime kupca. */
     private String ime;
+
+    /** Prezime kupca. */
     private String prezime;
+
+    /** Broj licne karte kupca. */
     private String brojLicneKarte;
+
+    /** Mesto u kojem kupac zivi. */
     private Mesto mesto;
 
-    public Kupac() {
-    }
-
+    /**
+     * Konstruktor koji inicijalizuje sve atribute kupca ukljucujuci i ID.
+     *
+     * @param idKupac jedinstveni identifikator kupca
+     * @param ime ime kupca
+     * @param prezime prezime kupca
+     * @param brojLicneKarte broj licne karte kupca
+     * @param mesto mesto u kojem kupac zivi
+     */
     public Kupac(int idKupac, String ime, String prezime, String brojLicneKarte, Mesto mesto) {
         this.idKupac = idKupac;
         this.ime = ime;
@@ -31,7 +54,16 @@ public class Kupac implements ApstraktniDomenskiObjekat,Serializable{
         this.brojLicneKarte = brojLicneKarte;
         this.mesto = mesto;
     }
-    
+
+    /**
+     * Konstruktor koji inicijalizuje atribute kupca bez ID-a.
+     * Koristi se prilikom kreiranja novog kupca pre unosa u bazu podataka.
+     *
+     * @param ime ime kupca
+     * @param prezime prezime kupca
+     * @param brojLicneKarte broj licne karte kupca
+     * @param mesto mesto u kojem kupac zivi
+     */
     public Kupac(String ime, String prezime, String brojLicneKarte, Mesto mesto) {
         this.ime = ime;
         this.prezime = prezime;
@@ -39,61 +71,33 @@ public class Kupac implements ApstraktniDomenskiObjekat,Serializable{
         this.mesto = mesto;
     }
 
-    public Mesto getMesto() {
-        return mesto;
-    }
-
-    public void setMesto(Mesto mesto) {
-        this.mesto = mesto;
-    }
-
-    
-    
-    
-
-    public int getIdKupac() {
-        return idKupac;
-    }
-
-    public void setIdKupac(int idKupac) {
-        this.idKupac = idKupac;
-    }
-
-    public String getIme() {
-        return ime;
-    }
-
-    public void setIme(String ime) {
-        this.ime = ime;
-    }
-
-    public String getPrezime() {
-        return prezime;
-    }
-
-    public void setPrezime(String prezime) {
-        this.prezime = prezime;
-    }
-
-    public String getBrojLicneKarte() {
-        return brojLicneKarte;
-    }
-
-    public void setBrojLicneKarte(String brojLicneKarte) {
-        this.brojLicneKarte = brojLicneKarte;
-    }
-
+    /**
+     * Vraca tekstualnu reprezentaciju kupca koja sadrzi ime i prezime.
+     *
+     * @return string sa imenom i prezimenom kupca
+     */
     @Override
     public String toString() {
         return ime + " " + prezime;
     }
 
+    /**
+     * Vraca hash kod kupca racunat na osnovu jedinstvenog identifikatora.
+     *
+     * @return hash kod kupca
+     */
     @Override
     public int hashCode() {
-        int hash = 3;
-        return hash;
+        return Objects.hash(idKupac);
     }
 
+    /**
+     * Poredi ovog kupca sa drugim objektom na osnovu jedinstvenog identifikatora.
+     *
+     * @param obj objekat sa kojim se poredi
+     * @return true ako su kupci istog tipa i imaju isti idKupac, false ako je
+     *         obj null, ako je obj drugog tipa, ili ako se idKupac razlikuju
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -109,6 +113,11 @@ public class Kupac implements ApstraktniDomenskiObjekat,Serializable{
         return this.idKupac == other.idKupac;
     }
 
+    /**
+     * Vraca naziv tabele "kupac" u bazi podataka.
+     *
+     * @return naziv tabele "kupac"
+     */
     @Override
     public String vratiNazivTabele() {
         return "kupac";
@@ -117,19 +126,19 @@ public class Kupac implements ApstraktniDomenskiObjekat,Serializable{
     @Override
     public List<ApstraktniDomenskiObjekat> vratiListu(ResultSet rs) throws Exception {
         List<ApstraktniDomenskiObjekat> lista = new ArrayList<>();
-        
-        while(rs.next()){
-                int id = rs.getInt("kupac.idKupac");
-                String ime  = rs.getString("kupac.ime");
-                String prezime  = rs.getString("kupac.prezime");
-                String brojLicneKarte  = rs.getString("kupac.brojLicneKarte");
-                int idMesto = rs.getInt("kupac.idMesto");
-                String naziv = rs.getString("mesto.naziv");
-                Mesto mesto = new Mesto(idMesto, naziv);
-                Kupac k = new Kupac(id, ime, prezime, brojLicneKarte, mesto);
-                lista.add(k);
+
+        while (rs.next()) {
+            int id = rs.getInt("kupac.idKupac");
+            String ime = rs.getString("kupac.ime");
+            String prezime = rs.getString("kupac.prezime");
+            String brojLicneKarte = rs.getString("kupac.brojLicneKarte");
+            int idMesto = rs.getInt("kupac.idMesto");
+            String naziv = rs.getString("mesto.naziv");
+            Mesto mesto = new Mesto(idMesto, naziv);
+            Kupac k = new Kupac(id, ime, prezime, brojLicneKarte, mesto);
+            lista.add(k);
         }
-        
+
         return lista;
     }
 
@@ -147,20 +156,19 @@ public class Kupac implements ApstraktniDomenskiObjekat,Serializable{
     public String vratiPrimarniKljuc() {
         return "kupac.idKupac=" + idKupac;
     }
-        
 
     @Override
     public ApstraktniDomenskiObjekat vratiObjekatIzRS(ResultSet rs) throws Exception {
-            if (rs.next()) {
-                int id = rs.getInt("kupac.idKupac");
-                String ime  = rs.getString("kupac.ime");
-                String prezime  = rs.getString("kupac.prezime");
-                String brojLicneKarte  = rs.getString("kupac.brojLicneKarte");
-                int idMesto = rs.getInt("kupac.idMesto");
-                String nazivMesta = rs.getString("mesto.naziv");
-                Mesto mesto = new Mesto(idMesto, nazivMesta);
-                return new Kupac(id, ime, prezime, brojLicneKarte, mesto);
-            }
+        if (rs.next()) {
+            int id = rs.getInt("kupac.idKupac");
+            String ime = rs.getString("kupac.ime");
+            String prezime = rs.getString("kupac.prezime");
+            String brojLicneKarte = rs.getString("kupac.brojLicneKarte");
+            int idMesto = rs.getInt("kupac.idMesto");
+            String nazivMesta = rs.getString("mesto.naziv");
+            Mesto mesto = new Mesto(idMesto, nazivMesta);
+            return new Kupac(id, ime, prezime, brojLicneKarte, mesto);
+        }
         return null;
     }
 
@@ -168,7 +176,5 @@ public class Kupac implements ApstraktniDomenskiObjekat,Serializable{
     public String vratiVrednostiZaIzmenu() {
         return "ime = '" + ime + "',prezime = '" + prezime + "',brojLicneKarte = '" + brojLicneKarte + "',idMesto = " + mesto.getIdMesto();
     }
-    
-    
-    
+
 }

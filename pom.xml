@@ -9,7 +9,7 @@
   	<module>server</module>
   	<module>klijent</module>
   </modules>
-  
+
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -40,7 +40,13 @@
 		    <version>5.3.1</version>
 		    <scope>test</scope>
 		</dependency>
-		
+        <dependency>
+			 <groupId>org.projectlombok</groupId>
+			 <artifactId>lombok</artifactId>
+			 <version>1.18.30</version>
+			 <scope>provided</scope>
+			</dependency>
+
     </dependencies>
 </dependencyManagement>
 
@@ -78,10 +84,23 @@
 	                <argLine>-XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
 	            </configuration>
 	        </plugin>
+	        <plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-compiler-plugin</artifactId>
+			    <configuration>
+			        <annotationProcessorPaths>
+			            <path>
+			                <groupId>org.projectlombok</groupId>
+			                <artifactId>lombok</artifactId>
+			                <version>1.18.30</version>
+			            </path>
+			        </annotationProcessorPaths>
+			    </configuration>
+			</plugin>
 	    </plugins>
 	</pluginManagement>
   </build>
-  
+
   <repositories>
     <repository>
         <id>netbeans</id>

@@ -8,15 +8,34 @@ import json.JsonUtil;
 /**
  * Sistemska operacija koja generise JSON racun za dato iznajmljivanje.
  * Racun se cuva u fajl sistemu servera u folderu "racuni".
+ *
+ * @author Andrijana Opacic
+ * @see Iznajmljivanje
+ * @see JsonUtil
  */
 public class GenerisiRacunSO extends ApstraktnaGenerickaOperacija {
 
+	/** Indikator uspesnosti generisanja racuna. */
     private boolean uspesno = false;
 
+    /**
+    * Vraca indikator uspesnosti generisanja racuna.
+    *
+    * @return true ako je racun uspesno generisan, false inace
+    */
     public boolean getUspesno() {
         return uspesno;
     }
 
+    /**
+     * Proverava preduslove pre generisanja racuna.
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa, da li je
+     * ID iznajmljivanja ispravan, i da li iznajmljivanje ima bar jednu stavku.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} za koje se generise racun
+     * @throws Exception ako parametar nije odgovarajuceg tipa, ako ID
+     *         iznajmljivanja nije ispravan, ili ako iznajmljivanje nema stavki
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Iznajmljivanje)) {
@@ -32,6 +51,15 @@ public class GenerisiRacunSO extends ApstraktnaGenerickaOperacija {
         }
     }
 
+    /**
+     * Izvrsava generisanje JSON racuna za dato iznajmljivanje koristeci
+     * {@link JsonUtil#serijalizujRacun(Iznajmljivanje, String)}. Racun se
+     * cuva u fajlu "racuni/racun_{idIznajmljivanje}.json".
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} za koje se generise racun
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske prilikom kreiranja racuna
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         Iznajmljivanje iznajmljivanje = (Iznajmljivanje) objekat;

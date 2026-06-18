@@ -10,22 +10,52 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
+ * Predstavlja iznajmljivanje bicikli koje je kupac napravio kod prodavca.
+ * Sadrzi listu stavki iznajmljivanja koje opisuju koje bicikle su iznajmljene
+ * i u kom periodu, kao i ukupan iznos za sve stavke.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see StavkaIznajmljivanja
+ * @see Kupac
+ * @see Prodavac
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class Iznajmljivanje implements ApstraktniDomenskiObjekat,Serializable{
     
+	/** Jedinstveni identifikator iznajmljivanja u bazi podataka. */
     private int idIznajmljivanje;
+    
+    /** Ukupan iznos za sve stavke iznajmljivanja. */
     private double ukupanIznos;
+    
+    /** Lista stavki koje opisuju iznajmljene bicikle u okviru ovog iznajmljivanja. */
     private List<StavkaIznajmljivanja> listaStavkiIznajmljivanja;
+    
+    /** Kupac koji je napravio iznajmljivanje. */
     private Kupac kupac;
+    
+    /** Prodavac koji je obradio iznajmljivanje. */
     private Prodavac prodavac;
 
-    public Iznajmljivanje() {
-    }
 
+    /**
+     * Konstruktor koji inicijalizuje sve atribute iznajmljivanja.
+     *
+     * @param idIznajmljivanje jedinstveni identifikator iznajmljivanja
+     * @param ukupanIznos ukupan iznos za sve stavke iznajmljivanja
+     * @param listaStavkiIznajmljivanja lista stavki iznajmljivanja
+     * @param kupac kupac koji je napravio iznajmljivanje
+     * @param prodavac prodavac koji je obradio iznajmljivanje
+     */
     public Iznajmljivanje(int idIznajmljivanje, double ukupanIznos, List<StavkaIznajmljivanja> listaStavkiIznajmljivanja, Kupac kupac, Prodavac prodavac) {
         this.idIznajmljivanje = idIznajmljivanje;
         this.ukupanIznos = ukupanIznos;
@@ -34,56 +64,23 @@ public class Iznajmljivanje implements ApstraktniDomenskiObjekat,Serializable{
         this.prodavac = prodavac;
     }
 
-    public Kupac getKupac() {
-        return kupac;
-    }
-
-    public void setKupac(Kupac kupac) {
-        this.kupac = kupac;
-    }
-
-    public Prodavac getProdavac() {
-        return prodavac;
-    }
-
-    public void setProdavac(Prodavac prodavac) {
-        this.prodavac = prodavac;
-    }
-
-    
-
-    public List<StavkaIznajmljivanja> getListaStavkiIznajmljivanja() {
-        return listaStavkiIznajmljivanja;
-    }
-
-    public void setListaStavkiIznajmljivanja(List<StavkaIznajmljivanja> listaStavkiIznajmljivanja) {
-        this.listaStavkiIznajmljivanja = listaStavkiIznajmljivanja;
-    }
-    
-    
-
-    public int getIdIznajmljivanje() {
-        return idIznajmljivanje;
-    }
-
-    public void setIdIznajmljivanje(int idIznajmljivanje) {
-        this.idIznajmljivanje = idIznajmljivanje;
-    }
-
-    public double getUkupanIznos() {
-        return ukupanIznos;
-    }
-
-    public void setUkupanIznos(double ukupanIznos) {
-        this.ukupanIznos = ukupanIznos;
-    }
-
+    /**
+     * Vraca hash kod iznajmljivanja racunat na osnovu jedinstvenog identifikatora.
+     *
+     * @return hash kod iznajmljivanja
+     */
     @Override
     public int hashCode() {
-        int hash = 5;
-        return hash;
+        return Objects.hash(idIznajmljivanje);
     }
 
+    /**
+     * Poredi ovo iznajmljivanje sa drugim objektom na osnovu jedinstvenog identifikatora.
+     *
+     * @param obj objekat sa kojim se poredi
+     * @return true ako su iznajmljivanja istog tipa i imaju isti idIznajmljivanje, false ako je
+     *         obj null, ako je obj drugog tipa, ili ako se idIznajmljivanje razlikuju
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -99,21 +96,35 @@ public class Iznajmljivanje implements ApstraktniDomenskiObjekat,Serializable{
         return this.idIznajmljivanje == other.idIznajmljivanje;
     }
 
-    
-    
-    
-
+    /**
+     * Vraca tekstualnu reprezentaciju iznajmljivanja sa svim atributima.
+     *
+     * @return string sa svim atributima iznajmljivanja
+     */
     @Override
     public String toString() {
-        return "Iznajmljivanje{" + "idIznajmljivanje=" + idIznajmljivanje + ", ukupanIznos=" + ukupanIznos + 
-                ", listaStavkiIznajmljivanja=" + listaStavkiIznajmljivanja + ", kupac=" + kupac + ", prodavac=" + prodavac + '}';
+        return "Iznajmljivanje{" + "idIznajmljivanje=" + idIznajmljivanje + ", ukupanIznos=" + ukupanIznos + ", listaStavkiIznajmljivanja=" + listaStavkiIznajmljivanja + ", kupac=" + kupac + ", prodavac=" + prodavac + '}';
     }
 
+    /**
+     * Vraca naziv tabele "iznajmljivanje" u bazi podataka.
+     *
+     * @return naziv tabele "iznajmljivanje"
+     */
     @Override
     public String vratiNazivTabele() {
         return "iznajmljivanje";
     }
 
+    /**
+     * Vraca listu iznajmljivanja kreiranih na osnovu podataka iz ResultSet-a.
+     * Svako iznajmljivanje se kreira sa praznom listom stavki - stavke se
+     * ucitavaju posebno, odvojenim upitom.
+     *
+     * @param rs ResultSet objekat koji sadrzi podatke iz baze
+     * @return lista iznajmljivanja kreiranih iz ResultSet-a, sa praznim listama stavki
+     * @throws Exception ako dodje do greske pri citanju podataka iz ResultSet-a
+     */
     @Override
     public List<ApstraktniDomenskiObjekat> vratiListu(ResultSet rs) throws Exception {
         List<ApstraktniDomenskiObjekat> lista = new ArrayList<>();
@@ -164,6 +175,16 @@ public class Iznajmljivanje implements ApstraktniDomenskiObjekat,Serializable{
         return "iznajmljivanje.idIznajmljivanje=" +idIznajmljivanje;
     }
 
+    /**
+     * Vraca jedno iznajmljivanje kreirano na osnovu podataka iz ResultSet-a.
+     * Iznajmljivanje se kreira sa praznom listom stavki - stavke se
+     * ucitavaju posebno, odvojenim upitom.
+     *
+     * @param rs ResultSet objekat koji sadrzi podatke iz baze
+     * @return objekat iznajmljivanja kreiran iz ResultSet-a sa praznom listom stavki,
+     *         ili null ako dodje do greske pri citanju podataka
+     * @throws Exception ako dodje do greske pri citanju podataka iz ResultSet-a
+     */
     @Override
     public ApstraktniDomenskiObjekat vratiObjekatIzRS(ResultSet rs) throws Exception {
         try {

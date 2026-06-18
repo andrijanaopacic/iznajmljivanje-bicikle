@@ -12,15 +12,46 @@ import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
+/**
+ * Sistemska operacija za izmenu postojeceg iznajmljivanja zajedno sa
+ * njegovim stavkama. Pre izmene proverava da li neko drugo iznajmljivanje
+ * (sa razlicitim ID-om) vec ima identicne podatke (ukupan iznos, prodavac,
+ * kupac i stavke). Prilikom izmene, stavke koje vise ne postoje u
+ * prosledjenom iznajmljivanju se brisu, postojece stavke se azuriraju, a
+ * nove stavke se dodaju. Nakon izmene, ponovo se generise i JSON racun.
+ *
+ * @author Andrijana Opacic
+ * @see Iznajmljivanje
+ * @see StavkaIznajmljivanja
+ * @see GenerisiRacunSO
+ */
 public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
 
+	/** Indikator uspesnosti izmene iznajmljivanja. */
     private boolean uspesno = false;
+    
+    /** Indikator da li drugo iznajmljivanje sa identicnim podacima vec postoji u bazi podataka. */
     private boolean postoji = false;
 
+    /**
+     * Vraca indikator uspesnosti izmene iznajmljivanja.
+     *
+     * @return true ako je iznajmljivanje uspesno izmenjeno, false inace
+     */
     public boolean getUspesno() {
         return uspesno;
     }
 
+    /**
+     * Proverava preduslove pre izmene iznajmljivanja.
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa i da li
+     * neko drugo iznajmljivanje (razlicitog ID-a) vec ima identicne podatke
+     * (ukupan iznos, prodavac, kupac i isti broj podudarajucih stavki).
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koje se izmenjuje
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws SQLException ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Iznajmljivanje)) {
@@ -79,6 +110,22 @@ public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
         }
     }
 
+    /**
+     * Izvrsava izmenu iznajmljivanja u bazi podataka.
+     * Izmena se vrsi samo ako ne postoji drugo iznajmljivanje sa identicnim
+     * podacima. Stavke koje su prethodno postojale u bazi, a vise se ne
+     * nalaze u prosledjenoj listi stavki, se brisu. Stavke koje vec postoje
+     * u bazi se azuriraju, a nove stavke se dodaju. Nakon obrade stavki,
+     * ukupan iznos iznajmljivanja se ponovo izracunava na osnovu zbira
+     * iznosa svih prosledjenih stavki, a iznajmljivanje se azurira u bazi.
+     * Na kraju se pokusava ponovo generisati JSON racun za izmenjeno
+     * iznajmljivanje; ukoliko generisanje racuna ne uspe, greska se samo
+     * zapisuje u konzolu i ne prekida izvrsavanje operacije.
+     *
+     * @param objekat objekat tipa {@link Iznajmljivanje} koje se izmenjuje
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {

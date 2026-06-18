@@ -7,23 +7,45 @@ package operacije.mesto;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import model.Bicikla;
+import model.Kupac;
 import model.Mesto;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
+ * Sistemska operacija za kreiranje novog mesta.
+ * Proverava da li mesto sa tim nazivom vec postoji u bazi.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Mesto
  */
 public class KreirajMestoSO extends ApstraktnaGenerickaOperacija{
 
+	/** Indikator uspesnosti kreiranja mesta. */
     private boolean uspesno = false;
+    
+    /** Indikator da li mesto sa istim nazivom vec postoji u bazi podataka. */
     private boolean postoji = false;
 
+    /**
+     * Vraca indikator uspesnosti kreiranja mesta.
+     *
+     * @return true ako je mesto uspesno kreirana, false inace
+     */
     public boolean getUspesno() {
         return uspesno;
     }
     
+    /**
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa i
+     * da li mesto sa istim nazivom vec postoji u bazi podataka.
+     *
+     * @param objekat objekat tipa {@link Mesto} koji se kreira
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws SQLException ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Mesto)) {
@@ -46,6 +68,14 @@ public class KreirajMestoSO extends ApstraktnaGenerickaOperacija{
 
     }
 
+    /**
+     * Izvrsava kreiranje mesta u bazi podataka.
+     * Mesto se kreira samo ako ne postoji u bazi podataka. 
+     *
+     * @param objekat objekat tipa {@link Mesto} koji se kreira
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {

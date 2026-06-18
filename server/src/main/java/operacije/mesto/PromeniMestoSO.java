@@ -7,23 +7,45 @@ package operacije.mesto;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import model.Bicikla;
 import model.Mesto;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
+ * Sistemska operacija za izmenu postojeceg mesta.
+ * Pre izmene proverava da li neko drugo mesto (sa razlicitim ID-om)
+ * vec ima isti naziv.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see Mesto
  */
 public class PromeniMestoSO extends ApstraktnaGenerickaOperacija{
 
+	/** Indikator uspesnosti izmene mesta. */
     private boolean uspesno = false;
+    
+    /** Indikator da li drugo mesto sa istim nazivom vec postoji u bazi podataka. */
     private boolean postoji = false;
 
+    /**
+     * Vraca indikator uspesnosti izmene mesta.
+     *
+     * @return true ako je mesto uspesno izmenjeno, false inace
+     */
     public boolean getUspesno() {
         return uspesno;
     }
     
+    /**
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa i
+     * da li neko drugo mesto (razlicitog ID-a) vec ima iste naziv.
+     *
+     * @param objekat objekat tipa {@link Mesto} koji se izmenjuje
+     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws SQLException ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Mesto)) {
@@ -46,6 +68,15 @@ public class PromeniMestoSO extends ApstraktnaGenerickaOperacija{
         }
     }
 
+    /**
+     * Izvrsava izmenu mesta u bazi podataka.
+     * Mesto se izmenjuje samo ako ne postoji drugo mesto sa istim
+     * nazivom.
+     *
+     * @param objekat objekat tipa {@link Mesto} koji se izmenjuje
+     * @param kljuc nije koriscen u ovoj operaciji
+     * @throws Exception ako dodje do greske pri radu sa bazom podataka
+     */
     @Override
     protected void izvrsi(Object objekat, Object kljuc) throws Exception {
         if (!postoji) {

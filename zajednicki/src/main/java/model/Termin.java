@@ -10,48 +10,63 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
+ * Predstavlja termin dezurstva u kojem prodavac moze biti dezuran.
  *
- * @author HP
+ * @author Andrijana Opacic
+ * @see ProdavacTermin
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class Termin implements ApstraktniDomenskiObjekat,Serializable{
     
+	/** Jedinstveni identifikator termina dezurstva u bazi podataka. */
     private int idTerminDezurstva;
-    private String naziv;
-
-    public Termin() {
-    }
     
+    /** Naziv termina dezurstva. */
+    private String naziv;
+    
+    /**
+     * Konstruktor koji inicijalizuje naziv termina bez ID-a.
+     * Koristi se prilikom kreiranja novog termina pre unosa u bazu podataka.
+     *
+     * @param naziv naziv termina
+     */
     public Termin(String naziv) {
         this.naziv = naziv;
     }
 
+    /**
+     * Konstruktor koji inicijalizuje sve atribute termina ukljucujuci i ID.
+     *
+     * @param idTerminDezurstva jedinstveni identifikator termina
+     * @param naziv naziv termina
+     */
     public Termin(int idTerminDezurstva, String naziv) {
         this.idTerminDezurstva = idTerminDezurstva;
         this.naziv = naziv;
     }
 
-    public int getIdTerminDezurstva() {
-        return idTerminDezurstva;
-    }
-
-    public void setIdTerminDezurstva(int idTerminDezurstva) {
-        this.idTerminDezurstva = idTerminDezurstva;
-    }
-
-    public String getNaziv() {
-        return naziv;
-    }
-
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
-
+    /**
+     * Vraca tekstualnu reprezentaciju termina koja sadrzi njegov naziv.
+     *
+     * @return naziv termina
+     */
     @Override
     public String toString() {
         return naziv;
     }
 
+    /**
+     * Vraca naziv tabele "termin" u bazi podataka.
+     *
+     * @return naziv tabele "termin"
+     */
     @Override
     public String vratiNazivTabele() {
         return "termin";
