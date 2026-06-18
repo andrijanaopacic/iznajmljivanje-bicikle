@@ -1,4 +1,4 @@
-package operacije.kupac;
+package operacije.termin;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -14,20 +14,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-import model.Kupac;
-import model.Mesto;
+import model.Termin;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 import repozitorijum.db.impl.DBRepozitorijumGenericki;
 
-@DisplayName("Testovi za SO PromeniKupacSO")
-class PromeniKupacSOTest {
+@DisplayName("Testovi za SO PromeniTerminSO")
+class PromeniTerminSOTest {
 
-    PromeniKupacSO so;
+    PromeniTerminSO so;
 
     @BeforeEach
     void setUp() throws Exception {
-        so = new PromeniKupacSO();
+        so = new PromeniTerminSO();
     }
 
     @AfterEach
@@ -52,7 +51,7 @@ class PromeniKupacSOTest {
         assertTrue(ex.getMessage().contains("odgovarajućeg tipa"));
     }
 
-    private PromeniKupacSO napraviSOSaMockom(
+    private PromeniTerminSO napraviSOSaMockom(
             DBRepozitorijumGenericki mockBroker,
             Connection mockConnection,
             MockedStatic<DBKonekcija> mockedStatic) throws Exception {
@@ -60,7 +59,7 @@ class PromeniKupacSOTest {
         mockedStatic.when(DBKonekcija::getInstance).thenReturn(mockDBKonekcija);
         when(mockDBKonekcija.getConnection()).thenReturn(mockConnection);
 
-        PromeniKupacSO soSaMockom = new PromeniKupacSO();
+        PromeniTerminSO soSaMockom = new PromeniTerminSO();
         Field brokerField = ApstraktnaGenerickaOperacija.class.getDeclaredField("broker");
         brokerField.setAccessible(true);
         brokerField.set(soSaMockom, mockBroker);
@@ -68,8 +67,8 @@ class PromeniKupacSOTest {
     }
 
     @Test
-    void testIzvrsiKupacNePostojiUspesnoIzmenjen() throws Exception {
-        Kupac kupac = new Kupac(1, "Marko", "Markovic", "123456789", new Mesto(1, "Beograd"));
+    void testIzvrsiTerminNePostojiUspesnoIzmenjen() throws Exception {
+        Termin termin = new Termin(1, "Jutarnja");
 
         DBRepozitorijumGenericki mockBroker = mock(DBRepozitorijumGenericki.class);
         doNothing().when(mockBroker).edit(any());
@@ -82,18 +81,18 @@ class PromeniKupacSOTest {
         when(mockRs.next()).thenReturn(false);
 
         try (MockedStatic<DBKonekcija> mockedStatic = mockStatic(DBKonekcija.class)) {
-            PromeniKupacSO soSaMockom = napraviSOSaMockom(mockBroker, mockConnection, mockedStatic);
+            PromeniTerminSO soSaMockom = napraviSOSaMockom(mockBroker, mockConnection, mockedStatic);
 
-            soSaMockom.izvrsiOperaciju(kupac, null);
+            soSaMockom.izvrsiOperaciju(termin, null);
 
-            assertTrue(soSaMockom.getUspesno(), "Izmena kupca mora biti uspešna kada ne postoji duplikat");
-            verify(mockBroker, times(1)).edit(kupac);
+            assertTrue(soSaMockom.getUspesno(), "Izmena termina mora biti uspešna kada ne postoji duplikat");
+            verify(mockBroker, times(1)).edit(termin);
         }
     }
 
     @Test
-    void testIzvrsiIstiPodaciIstiKupacUspesnoIzmenjen() throws Exception {
-        Kupac kupac = new Kupac(1, "Marko", "Markovic", "123456789", new Mesto(1, "Beograd"));
+    void testIzvrsiIstiNazivIstiTerminUspesnoIzmenjen() throws Exception {
+        Termin termin = new Termin(1, "Jutarnja");
 
         DBRepozitorijumGenericki mockBroker = mock(DBRepozitorijumGenericki.class);
         doNothing().when(mockBroker).edit(any());
@@ -106,18 +105,18 @@ class PromeniKupacSOTest {
         when(mockRs.next()).thenReturn(false);
 
         try (MockedStatic<DBKonekcija> mockedStatic = mockStatic(DBKonekcija.class)) {
-            PromeniKupacSO soSaMockom = napraviSOSaMockom(mockBroker, mockConnection, mockedStatic);
+            PromeniTerminSO soSaMockom = napraviSOSaMockom(mockBroker, mockConnection, mockedStatic);
 
-            soSaMockom.izvrsiOperaciju(kupac, null);
+            soSaMockom.izvrsiOperaciju(termin, null);
 
-            assertTrue(soSaMockom.getUspesno(),  "Izmena mora biti uspešna i kada podaci ostaju isti, jer se sopstveni ID izuzima iz provere");
-            verify(mockBroker, times(1)).edit(kupac);
+            assertTrue(soSaMockom.getUspesno(), "Izmena mora biti uspešna i kada naziv ostaje isti, jer se sopstveni ID izuzima iz provere");
+            verify(mockBroker, times(1)).edit(termin);
         }
     }
 
     @Test
-    void testIzvrsiDrugiKupacSaIstimPodacimaNeUspesno() throws Exception {
-        Kupac kupac = new Kupac(2, "Marko", "Markovic", "123456789", new Mesto(1, "Beograd"));
+    void testIzvrsiDrugiTerminSaIstimNazivomNeUspesno() throws Exception {
+        Termin termin = new Termin(2, "Jutarnja");
 
         DBRepozitorijumGenericki mockBroker = mock(DBRepozitorijumGenericki.class);
 
@@ -129,11 +128,11 @@ class PromeniKupacSOTest {
         when(mockRs.next()).thenReturn(true, false);
 
         try (MockedStatic<DBKonekcija> mockedStatic = mockStatic(DBKonekcija.class)) {
-            PromeniKupacSO soSaMockom = napraviSOSaMockom(mockBroker, mockConnection, mockedStatic);
+            PromeniTerminSO soSaMockom = napraviSOSaMockom(mockBroker, mockConnection, mockedStatic);
 
-            soSaMockom.izvrsiOperaciju(kupac, null);
+            soSaMockom.izvrsiOperaciju(termin, null);
 
-            assertFalse(soSaMockom.getUspesno(),  "Izmena ne treba da bude uspešna kada drugi kupac sa istim podacima već postoji");
+            assertFalse(soSaMockom.getUspesno(), "Izmena ne treba da bude uspešna kada drugi termin sa istim nazivom već postoji");
             verify(mockBroker, never()).edit(any());
         }
     }

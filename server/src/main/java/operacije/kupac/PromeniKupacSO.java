@@ -3,30 +3,26 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package operacije.kupac;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import model.Kupac;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
-
 /**
  * Sistemska operacija za izmenu postojeceg kupca.
- * Pre izmene proverava da li kupac sa istim podacima (ime, prezime,
+ * Pre izmene proverava da li DRUGI kupac sa istim podacima (ime, prezime,
  * broj licne karte i mesto) vec postoji u bazi.
  *
  * @author Andrijana Opacic
  * @see Kupac
  */
 public class PromeniKupacSO extends ApstraktnaGenerickaOperacija{
-
 	/** Indikator uspesnosti izmene kupca. */
     private boolean uspesno = false;
     
-    /** Indikator da li kupac sa istim podacima vec postoji u bazi podataka. */
+    /** Indikator da li drugi kupac sa istim podacima vec postoji u bazi podataka. */
     private boolean postoji = false;
-
     /**
      * Vraca indikator uspesnosti izmene kupca.
      *
@@ -38,8 +34,8 @@ public class PromeniKupacSO extends ApstraktnaGenerickaOperacija{
     
     /**
      * Proverava da li je prosledjen parametar odgovarajuceg tipa i
-     * da li kupac sa istim podacima (ime, prezime, broj licne karte
-     * i mesto) vec postoji u bazi.
+     * da li drugi kupac (sa razlicitim ID-om) sa istim podacima (ime,
+     * prezime, broj licne karte i mesto) vec postoji u bazi. 
      *
      * @param objekat objekat tipa {@link Kupac} koji se izmenjuje
      * @throws Exception ako parametar nije odgovarajuceg tipa
@@ -50,23 +46,17 @@ public class PromeniKupacSO extends ApstraktnaGenerickaOperacija{
          if (objekat == null || !(objekat instanceof Kupac)) {
             throw new Exception("Nije prosleđen parametar odgovarajućeg tipa.");
         }
-
         try {
-
-            String upit = "SELECT * FROM kupac k JOIN mesto m ON k.idMesto = m.idMesto WHERE k.ime='" + ((Kupac) objekat).getIme() + "' AND k.prezime='" + ((Kupac) objekat).getPrezime() + "' AND k.brojLicneKarte='" + ((Kupac) objekat).getBrojLicneKarte() + "' AND m.naziv='" + ((Kupac) objekat).getMesto().getNaziv() + "'";
+            String upit = "SELECT * FROM kupac k JOIN mesto m ON k.idMesto = m.idMesto WHERE k.ime='" + ((Kupac) objekat).getIme() + "' AND k.prezime='" + ((Kupac) objekat).getPrezime() + "' AND k.brojLicneKarte='" + ((Kupac) objekat).getBrojLicneKarte() + "' AND m.naziv='" + ((Kupac) objekat).getMesto().getNaziv() + "' AND k.idKupac != " + ((Kupac) objekat).getIdKupac();
             Statement st = DBKonekcija.getInstance().getConnection().createStatement();
             ResultSet rs = st.executeQuery(upit);
-
             while (rs.next()) {
-
                 postoji = true;
             }
-
         } catch (SQLException ex) {
             throw ex;
         }
     }
-
     /**
      * Azurira kupca preko brokera, samo ako ne postoji drugi kupac sa istim podacima.
      *
