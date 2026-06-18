@@ -49,7 +49,6 @@ public class ObrisiBiciklaSO extends ApstraktnaGenerickaOperacija {
         }
         Bicikla bicikla = (Bicikla) objekat;
         try {
-            // Proveravamo u bicikla tabeli jer je idBicikla tamo primarni kljuc
             String upit = "SELECT * FROM bicikla"
                     + " JOIN stavkaiznajmljivanja si ON si.idBicikla = bicikla.idBicikla"
                     + " WHERE bicikla.idBicikla = " + bicikla.getIdBicikla();
