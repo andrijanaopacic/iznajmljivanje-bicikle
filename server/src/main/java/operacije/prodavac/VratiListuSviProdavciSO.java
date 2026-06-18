@@ -13,7 +13,8 @@ import operacije.ApstraktnaGenerickaOperacija;
  *
  * @author Andrijana Opacic
  * @see Prodavac
- */ class VratiListuSviProdavciSO extends ApstraktnaGenerickaOperacija {
+ */ 
+public class VratiListuSviProdavciSO extends ApstraktnaGenerickaOperacija {
 	 
 	 /** Lista svih prodavaca dobijenih nakon izvrsavanja operacije. */
     private List<Prodavac> lista;
