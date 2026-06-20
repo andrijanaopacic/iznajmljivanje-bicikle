@@ -121,8 +121,8 @@ public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
 
     /**
      * Iznajmljivanje se kreira samo ako ne postoji u bazi podataka. Nakon dodavanja iznajmljivanja, preuzima se automatski generisani ID i
-     * koristi se da se sve stavke iznajmljivanja povezu sa njim i upisu u bazu. Na kraju se pokusava generisati J
-     * SON racun za novokreirano iznajmljivanje; ukoliko generisanje racuna ne uspe, greska se samo zapisuje u konzolu 
+     * koristi se da se sve stavke iznajmljivanja povezu sa njim i upisu u bazu. Na kraju se pokusava generisati 
+     * JSON racun za novokreirano iznajmljivanje; ukoliko generisanje racuna ne uspe, greska se samo zapisuje u konzolu 
      * i ne prekida izvrsavanje operacije.
      *
      * @param objekat objekat tipa {@link Iznajmljivanje} koje se kreira
@@ -171,4 +171,6 @@ public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
             }
         }
     }
+    
+    
 }

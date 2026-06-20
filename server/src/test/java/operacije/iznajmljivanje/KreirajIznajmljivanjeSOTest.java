@@ -63,10 +63,7 @@ class KreirajIznajmljivanjeSOTest {
         assertTrue(ex.getMessage().contains("odgovarajućeg tipa"));
     }
 
-    private KreirajIznajmljivanjeSO napraviSOSaMockom(
-            DBRepozitorijumGenericki mockBroker,
-            Connection mockConnection,
-            MockedStatic<DBKonekcija> mockedStatic) throws Exception {
+    private KreirajIznajmljivanjeSO napraviSOSaMockom(DBRepozitorijumGenericki mockBroker, Connection mockConnection, MockedStatic<DBKonekcija> mockedStatic) throws Exception {
         DBKonekcija mockDBKonekcija = mock(DBKonekcija.class);
         mockedStatic.when(DBKonekcija::getInstance).thenReturn(mockDBKonekcija);
         when(mockDBKonekcija.getConnection()).thenReturn(mockConnection);
@@ -97,8 +94,7 @@ class KreirajIznajmljivanjeSOTest {
 
         LocalDateTime vremeOd = LocalDateTime.now();
         LocalDateTime vremeDo = vremeOd.plusHours(2);
-        StavkaIznajmljivanja stavka = new StavkaIznajmljivanja(
-                bicikla, 1, 1000.0, 500.0, vremeOd, vremeDo, 2, 0, i);
+        StavkaIznajmljivanja stavka = new StavkaIznajmljivanja(bicikla, 1, 1000.0, 500.0, vremeOd, vremeDo, 2, 0, i);
         List<StavkaIznajmljivanja> stavke = new ArrayList<>();
         stavke.add(stavka);
         i.setListaStavkiIznajmljivanja(stavke);
@@ -116,9 +112,7 @@ class KreirajIznajmljivanjeSOTest {
         when(mockRsIzvrsi.next()).thenReturn(true, false); 
         when(mockRsIzvrsi.getInt("idIznajmljivanje")).thenReturn(777);
 
-        when(mockConnection.createStatement())
-                .thenReturn(mockStatementPreduslovi)
-                .thenReturn(mockStatementIzvrsi);
+        when(mockConnection.createStatement()).thenReturn(mockStatementPreduslovi).thenReturn(mockStatementIzvrsi);
         when(mockStatementPreduslovi.executeQuery(anyString())).thenReturn(mockRsPreduslovi);
         when(mockStatementIzvrsi.executeQuery(anyString())).thenReturn(mockRsIzvrsi);
 
@@ -132,5 +126,34 @@ class KreirajIznajmljivanjeSOTest {
             verify(mockBroker, times(1)).add(i);
             verify(mockBroker, times(1)).add(stavka);
         }
+    }
+    
+    @Test
+    void testIzvrsiIznajmljivanjeNevalidanUkupanIznosOdbijeno() throws Exception {
+        Prodavac prodavac = new Prodavac(1, "Ana", "Anic", "aanic", "sifra123");
+        Kupac kupac = new Kupac(1, "Marko", "Markovic", "123456789", new Mesto(1, "Beograd"));
+
+        BiciklaZaOdrasle bicikla = new BiciklaZaOdrasle();
+        bicikla.setIdBicikla(1);
+        bicikla.setMarka("Trek");
+        bicikla.setModel("Marlin");
+        bicikla.setCenaPoSatu(500.0);
+        bicikla.setCenaPoDanu(2000.0);
+
+        Iznajmljivanje i = new Iznajmljivanje();
+        i.setUkupanIznos(0.0);
+        i.setProdavac(prodavac);
+        i.setKupac(kupac);
+
+        LocalDateTime vremeOd = LocalDateTime.now();
+        LocalDateTime vremeDo = vremeOd.plusHours(2);
+        StavkaIznajmljivanja stavka = new StavkaIznajmljivanja(bicikla, 1, 1000.0, 500.0, vremeOd, vremeDo, 2, 0, i);
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        stavke.add(stavka);
+        i.setListaStavkiIznajmljivanja(stavke);
+
+        Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(i, null));
+
+        assertTrue(ex.getMessage().contains("Ukupan iznos mora biti veci od nule"));
     }
 }

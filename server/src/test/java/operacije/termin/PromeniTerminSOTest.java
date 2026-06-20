@@ -136,4 +136,13 @@ class PromeniTerminSOTest {
             verify(mockBroker, never()).edit(any());
         }
     }
+    
+    @Test
+    void testIzvrsiTerminNevalidanNazivOdbijeno() throws Exception {
+        Termin termin = new Termin(1, "");
+
+        Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(termin, null));
+
+        assertTrue(ex.getMessage().contains("Naziv termina ne moze biti prazan"));
+    }
 }

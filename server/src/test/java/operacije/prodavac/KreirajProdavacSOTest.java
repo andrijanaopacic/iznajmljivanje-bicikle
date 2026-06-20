@@ -112,4 +112,13 @@ class KreirajProdavacSOTest {
             verify(mockBroker, never()).add(any());
         }
     }
+    
+    @Test
+    void testIzvrsiProdavacNevalidnoImeOdbijeno() throws Exception {
+        Prodavac prodavac = new Prodavac(1, "", "Anic", "aanic", "sifra123");
+
+        Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(prodavac, null));
+
+        assertTrue(ex.getMessage().contains("Ime ne moze biti prazno"));
+    }
 }

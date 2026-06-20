@@ -28,9 +28,9 @@ public class BiciklaZaDecu extends Bicikla {
 	@Positive(message = "Velicina tockova mora biti veca od nule")
     private int velicinaTockova;
     
-    /** Broj brzina bicikle za decu, mora biti veci od nule i manji od 6. */
+	/** Broj brzina bicikle za decu, mora biti veci od nule i ne veci od 6. */
 	@Positive(message = "Broj brzina mora biti veci od nule")
-	@Max(value = 6, message = "Broj brzina mora biti manji od 6")
+	@Max(value = 6, message = "Broj brzina ne moze biti veci od 6")
     private int brojBrzina;
     
     /** Indikator da li bicikla ima pomocne tockove. */

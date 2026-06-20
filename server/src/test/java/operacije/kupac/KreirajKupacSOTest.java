@@ -60,7 +60,7 @@ class KreirajKupacSOTest {
         k.setBrojLicneKarte("123456789");
         k.setMesto(new Mesto(1, "Beograd"));
         Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(k, null));
-        assertTrue(ex.getMessage().contains("imena"));
+        assertTrue(ex.getMessage().contains("Ime ne moze biti prazno"));
     }
 
     @Test
@@ -81,7 +81,7 @@ class KreirajKupacSOTest {
         k.setBrojLicneKarte("123456789");
         k.setMesto(new Mesto(1, "Beograd"));
         Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(k, null));
-        assertTrue(ex.getMessage().contains("prezimena"));
+        assertTrue(ex.getMessage().contains("Prezime ne moze biti prazno"));
     }
 
     @Test
@@ -102,7 +102,7 @@ class KreirajKupacSOTest {
         k.setBrojLicneKarte(null);
         k.setMesto(new Mesto(1, "Beograd"));
         Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(k, null));
-        assertTrue(ex.getMessage().contains("lične karte"));
+        assertTrue(ex.getMessage().contains("Broj licne karte ne moze biti null"));
     }
 
     @Test

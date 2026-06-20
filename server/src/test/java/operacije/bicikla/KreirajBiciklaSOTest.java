@@ -94,8 +94,7 @@ class KreirajBiciklaSOTest {
 
             assertTrue(soSaMockom.getUspesno(), "Kreiranje bicikle mora biti uspešno kada bicikla ne postoji");
             assertEquals(5, bicikla.getIdBicikla());
-            verify(mockStatementIzvrsi, times(1))
-                    .executeUpdate(anyString(), eq(Statement.RETURN_GENERATED_KEYS));
+            verify(mockStatementIzvrsi, times(1)).executeUpdate(anyString(), eq(Statement.RETURN_GENERATED_KEYS));
             verify(mockStatementIzvrsi, times(1)).executeUpdate(contains("biciklazaodrasle"));
         }
     }
@@ -108,6 +107,8 @@ class KreirajBiciklaSOTest {
         bicikla.setBoja("Crvena");
         bicikla.setCenaPoSatu(500.0);
         bicikla.setCenaPoDanu(2000.0);
+        bicikla.setVelicinaTockova(26);
+        bicikla.setBrojBrzina(21);
 
         Connection mockConnection = mock(Connection.class);
         Statement mockStatement = mock(Statement.class);
@@ -125,4 +126,22 @@ class KreirajBiciklaSOTest {
             verify(mockStatement, never()).executeUpdate(anyString(), eq(Statement.RETURN_GENERATED_KEYS));
         }
     }
+    
+    @Test
+    void testIzvrsiBiciklaNevalidniPodaciOdbijena() throws Exception {
+        BiciklaZaOdrasle bicikla = new BiciklaZaOdrasle();
+        bicikla.setMarka("");
+        bicikla.setModel("Marlin");
+        bicikla.setBoja("Crvena");
+        bicikla.setCenaPoSatu(500.0);
+        bicikla.setCenaPoDanu(2000.0);
+        bicikla.setVelicinaTockova(26);
+        bicikla.setBrojBrzina(21);
+
+        Exception ex = assertThrows(Exception.class, () -> so.izvrsiOperaciju(bicikla, null));
+
+        assertTrue(ex.getMessage().contains("Marka ne moze biti prazna"));
+    }
+    
+    
 }
