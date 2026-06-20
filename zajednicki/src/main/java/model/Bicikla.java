@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,19 +32,24 @@ public abstract class Bicikla implements ApstraktniDomenskiObjekat, Serializable
 	 /** Jedinstveni identifikator bicikle u bazi podataka. */
     protected int idBicikla;
     
-    /** Cena iznajmljivanja bicikle po satu. */
+    /** Cena iznajmljivanja bicikle po satu koja mora biti pozitivna. */
+    @PositiveOrZero(message = "Cena po satu ne moze biti negativna")
     protected double cenaPoSatu;
     
-    /** Cena iznajmljivanja bicikle po danu. */
+    /** Cena iznajmljivanja bicikle po danu koja mora biti pozitivna. */
+    @PositiveOrZero(message = "Cena po danu ne moze biti negativna")
     protected double cenaPoDanu;
     
-    /** Marka bicikle. */
+    /** Marka bicikle, ne sme biti prazna. */
+    @NotBlank(message = "Marka ne moze biti prazna")
     protected String marka;
     
-    /** Model bicikle. */
+    /** Model bicikle, ne sme biti prazna. */
+    @NotBlank(message = "Model ne moze biti prazan")
     protected String model;
     
-    /** Boja bicikle. */
+    /** Boja bicikle, ne sme biti prazna. */
+    @NotBlank(message = "Boja ne moze biti prazna")
     protected String boja;
 
 

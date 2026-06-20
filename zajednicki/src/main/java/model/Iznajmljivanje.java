@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,16 +37,20 @@ public class Iznajmljivanje implements ApstraktniDomenskiObjekat,Serializable{
 	/** Jedinstveni identifikator iznajmljivanja u bazi podataka. */
     private int idIznajmljivanje;
     
-    /** Ukupan iznos za sve stavke iznajmljivanja. */
+    /** Ukupan iznos za sve stavke iznajmljivanja, mora biti veci od nule. */
+    @Positive(message = "Ukupan iznos mora biti veci od nule")
     private double ukupanIznos;
     
-    /** Lista stavki koje opisuju iznajmljene bicikle u okviru ovog iznajmljivanja. */
+    /** Lista stavki koje opisuju iznajmljene bicikle u okviru ovog iznajmljivanja, ne sme biti null ili prazna. */
+    @NotEmpty(message = "Lista stavki ne moze biti prazna")
     private List<StavkaIznajmljivanja> listaStavkiIznajmljivanja;
     
-    /** Kupac koji je napravio iznajmljivanje. */
+    /** Kupac koji je napravio iznajmljivanje, ne sme biti null. */
+    @NotNull(message = "Kupac ne moze biti null")
     private Kupac kupac;
     
-    /** Prodavac koji je obradio iznajmljivanje. */
+    /** Prodavac koji je obradio iznajmljivanje, ne sme biti null. */
+    @NotNull(message = "Prodavac ne moze biti null")
     private Prodavac prodavac;
 
 

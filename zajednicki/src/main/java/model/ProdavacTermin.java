@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,16 +31,20 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProdavacTermin implements ApstraktniDomenskiObjekat,Serializable{
     
-	/** Prodavac koji je dezuran. */
+	/** Prodavac koji je dezuran, ne sme biti null. */
+    @NotNull(message = "Prodavac ne moze biti null")
     private Prodavac prodavac;
     
-    /** Termin u kojem je prodavac dezuran. */
+    /** Termin u kojem je prodavac dezuran, ne sme biti null. */
+    @NotNull(message = "Termin ne moze biti null")
     private Termin termin;
     
-    /** Datum dezurstva prodavca. */
+    /** Datum dezurstva prodavca, ne sme biti null. */
+    @NotNull(message = "Datum dezurstva ne moze biti null")
     private LocalDate datumDezurstva;
     
-    /** Smena u kojoj je prodavac dezuran. */
+    /** Smena u kojoj je prodavac dezuran, ne sme biti prazna. */
+    @NotBlank(message = "Smena ne moze biti prazna")
     private String smena;
 
 

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,16 +34,24 @@ public class Prodavac implements ApstraktniDomenskiObjekat,Serializable {
 	/** Jedinstveni identifikator prodavca u bazi podataka. */
     private int idProdavac;
     
-    /** Ime prodavca. */
+    /** Ime prodavca, ne sme biti prazno i ne sme imati vise od 30 karaktera. */
+    @NotBlank(message = "Ime ne moze biti prazno")
+    @Size(max = 30, message = "Ime ne moze imati vise od 30 karaktera")
     private String ime;
     
-    /** Prezime prodavca. */
+    /** Prezime prodavca, ne sme biti prazno i ne sme imati vise od 30 karaktera. */
+    @NotBlank(message = "Prezime ne moze biti prazno")
+    @Size(max = 30, message = "Prezime ne moze imati vise od 30 karaktera")
     private String prezime;
     
-    /** Korisnicko ime prodavca koje se koristi za prijavu. */
+    /** Korisnicko ime prodavca koje se koristi za prijavu, ne sme biti prazno i ne sme imati vise od 20 karaktera. */
+    @NotBlank(message = "Korisnicko ime ne moze biti prazno")
+    @Size(max = 20, message = "Korisnicko ime ne moze imati vise od 20 karaktera")
     private String korisnickoIme;
     
-    /** Sifra prodavca koja se koristi za prijavu. */
+    /** Sifra prodavca koja se koristi za prijavu, ne sme biti prazna i ne sme imati vise od 20 karaktera. */
+    @NotBlank(message = "Sifra ne moze biti prazna")
+    @Size(max = 20, message = "Sifra ne moze imati vise od 20 karaktera")
     private String sifra;
     
     /** Lista termina u kojima je prodavac dostupan. */

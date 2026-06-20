@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +30,9 @@ public class Termin implements ApstraktniDomenskiObjekat,Serializable{
 	/** Jedinstveni identifikator termina dezurstva u bazi podataka. */
     private int idTerminDezurstva;
     
-    /** Naziv termina dezurstva. */
+    /** Naziv termina dezurstva, ne sme biti prazan i ne sme imati vise od 30 karaktera. */
+    @NotBlank(message = "Naziv termina ne moze biti prazan")
+    @Size(max = 30, message = "Naziv termina ne moze imati vise od 30 karaktera")
     private String naziv;
     
     /**

@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +28,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializable {
 
-	/** Iznajmljena bicikla u okviru ove stavke. */
+	/** Iznajmljena bicikla u okviru ove stavke, ne sme biti null. */
+    @NotNull(message = "Bicikla ne moze biti null")
     private Bicikla bicikla;
     
     /** Jedinstveni identifikator stavke iznajmljivanja u bazi podataka. */
@@ -38,10 +41,12 @@ public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializ
     /** Cena po danu ili po satu, preuzeta od bicikle u zavisnosti od broja dana. */
     private double cena;
     
-    /** Vreme od kada je bicikla iznajmljena. */
+    /** Vreme od kada je bicikla iznajmljena, ne sme biti u buducnosti. */
+    @PastOrPresent(message = "Vreme pocetka ne moze biti u buducnosti")
     private LocalDateTime vremeOd;
     
-    /** Vreme do kada je bicikla iznajmljena. */
+    /** Vreme do kada je bicikla iznajmljena, ne sme biti u buducnosti. */
+    @PastOrPresent(message = "Vreme zavrsetka ne moze biti u buducnosti")
     private LocalDateTime vremeDo;
     
     /** Broj sati na koje je bicikla iznajmljena, ako se iznajmljuje po satu. */
@@ -50,7 +55,8 @@ public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializ
     /** Broj dana na koje je bicikla iznajmljena, ako se iznajmljuje po danu. */
     private int brojDana;
     
-    /** Iznajmljivanje u okviru kojeg se nalazi ova stavka. */
+    /** Iznajmljivanje u okviru kojeg se nalazi ova stavka, ne sme biti null. */
+    @NotNull(message = "Iznajmljivanje ne moze biti null")
     private Iznajmljivanje iznajmljivanje;
 
 

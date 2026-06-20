@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,16 +29,21 @@ public class Kupac implements ApstraktniDomenskiObjekat, Serializable {
     /** Jedinstveni identifikator kupca u bazi podataka. */
     private int idKupac;
 
-    /** Ime kupca. */
+    /** Ime kupca, ne sme biti prazno. */
+    @NotBlank(message = "Ime ne moze biti prazno")
     private String ime;
 
-    /** Prezime kupca. */
+    /** Prezime kupca, ne sme biti prazno. */
+    @NotBlank(message = "Prezime ne moze biti prazno")
     private String prezime;
 
-    /** Broj licne karte kupca. */
+    /** Broj licne karte kupca, ne sme biti null i mora sadrzati tacno 9 cifara. */
+    @NotNull(message = "Broj licne karte ne moze biti null")
+    @Pattern(regexp = "\\d{9}", message = "Broj licne karte mora sadrzati 9 cifara")
     private String brojLicneKarte;
 
-    /** Mesto u kojem kupac zivi. */
+    /** Mesto u kojem kupac zivi, ne sme biti null. */
+    @NotNull(message = "Mesto ne moze biti null")
     private Mesto mesto;
 
     /**

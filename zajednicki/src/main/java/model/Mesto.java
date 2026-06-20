@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,10 +27,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Mesto implements ApstraktniDomenskiObjekat, Serializable {
 
-    /** Jedinstveni identifikator mesta u bazi podataka. */
+	/** Jedinstveni identifikator mesta u bazi podataka. */
     private int idMesto;
 
-    /** Naziv mesta. */
+    /** Naziv mesta, ne sme biti prazan i ne sme imati vise od 30 karaktera. */
+    @NotBlank(message = "Naziv mesta ne moze biti prazan")
+    @Size(max = 30, message = "Naziv mesta ne moze imati vise od 30 karaktera")
     private String naziv;
 
     /**

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,14 +24,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BiciklaSaRiksom extends Bicikla {
 
-	/** Broj sedista na riksi. */
-    private int brojSedista;
+	/** Broj sedista na riksi, mora biti pozitivan. */
+	@Positive(message = "Broj sedista mora biti veci od nule")
+	private int brojSedista;
     
-    /** Tip rikse, npr. "decija", "zatvorena" ili "otvorena". */
-    private String tipRikse;
+    /** Tip rikse, npr. "decija", "zatvorena" ili "otvorena" i ne sme biti prazna. */
+	@NotBlank(message = "Tip rikse ne moze biti prazan")
+	private String tipRikse;
     
-    /** Maksimalna nosivost rikse u kilogramima. */
-    private int maxNosivost;
+    /** Maksimalna nosivost rikse u kilogramima, mora biti veca od nule. */
+	@Positive(message = "Maksimalna nosivost mora biti veca od nule")
+	private int maxNosivost;
 
 
     /**
