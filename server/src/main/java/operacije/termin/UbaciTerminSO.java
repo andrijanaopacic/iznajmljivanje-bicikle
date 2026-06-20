@@ -7,6 +7,11 @@ package operacije.termin;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Termin;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
@@ -37,10 +42,12 @@ public class UbaciTerminSO extends ApstraktnaGenerickaOperacija{
     }
     
     /**
-     * Proverava da li je prosledjeni objekat odgovarajuceg tipa i da li vec postoji termin sa istim nazivom u bazi.
+     * Proverava da li je prosledjeni objekat odgovarajuceg tipa, da li su vrednosti atributa termina validne 
+     * (u skladu sa Jakarta Validation anotacijama definisanim u {@link Termin}), i da li vec postoji termin sa istim nazivom u bazi.
      *
      * @param objekat objekat tipa {@link Termin} koji se ubacuje
-     * @throws Exception ako objekat nije odgovarajuceg tipa ili dodje do greske pri radu sa bazom
+     * @throws Exception ako objekat nije odgovarajuceg tipa, ako podaci
+     *         nisu validni, ili dodje do greske pri radu sa bazom
      */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
@@ -48,21 +55,28 @@ public class UbaciTerminSO extends ApstraktnaGenerickaOperacija{
             throw new Exception("Nije prosleđen parametar odgovarajućeg tipa.");
         }
 
-        try {
+        Termin t = (Termin) objekat;
 
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Termin>> violations = validator.validate(t);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Termin> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
+        }
+
+        try {
             String upit = "SELECT * FROM termin WHERE naziv='" + ((Termin) objekat).getNaziv()+ "'";
             Statement st = DBKonekcija.getInstance().getConnection().createStatement();
             ResultSet rs = st.executeQuery(upit);
-
             while (rs.next()) {
                 postoji = true;
-
             }
-
         } catch (SQLException ex) {
             throw ex;
         }
-
     }
 
     /**

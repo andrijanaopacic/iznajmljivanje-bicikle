@@ -5,20 +5,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Iznajmljivanje;
 import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
- * Sistemska operacija za izmenu postojeceg iznajmljivanja zajedno sa
- * njegovim stavkama. Pre izmene proverava da li neko drugo iznajmljivanje
- * (sa razlicitim ID-om) vec ima identicne podatke (ukupan iznos, prodavac,
- * kupac i stavke). Prilikom izmene, stavke koje vise ne postoje u
- * prosledjenom iznajmljivanju se brisu, postojece stavke se azuriraju, a
- * nove stavke se dodaju. Nakon izmene, ponovo se generise i JSON racun.
+ * Sistemska operacija za izmenu postojeceg iznajmljivanja zajedno sa njegovim stavkama. Pre izmene proverava da li su vrednosti atributa
+ * iznajmljivanja validne, i da li neko drugo iznajmljivanje (sa razlicitim ID-om) vec ima identicne podatke (ukupan iznos, prodavac, kupac i
+ * stavke). Prilikom izmene, stavke koje vise ne postoje u prosledjenom iznajmljivanju se brisu, postojece stavke se azuriraju, 
+ * a nove stavke se dodaju. Nakon izmene, ponovo se generise i JSON racun.
  *
  * @author Andrijana Opacic
  * @see Iznajmljivanje
@@ -43,13 +45,13 @@ public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
     }
 
     /**
-     * Proverava preduslove pre izmene iznajmljivanja.
-     * Proverava da li je prosledjen parametar odgovarajuceg tipa i da li
-     * neko drugo iznajmljivanje (razlicitog ID-a) vec ima identicne podatke
-     * (ukupan iznos, prodavac, kupac i isti broj podudarajucih stavki).
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa, da li su vrednosti atributa iznajmljivanja validne 
+     * (u skladu sa Jakarta Validation anotacijama definisanim u {@link Iznajmljivanje}), i da li
+     * neko drugo iznajmljivanje (razlicitog ID-a) vec ima identicne podatke (ukupan iznos, prodavac, kupac i isti broj podudarajucih stavki).
      *
      * @param objekat objekat tipa {@link Iznajmljivanje} koje se izmenjuje
-     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws Exception ako parametar nije odgovarajuceg tipa, ili ako
+     *         vrednosti atributa nisu validne
      * @throws SQLException ako dodje do greske pri radu sa bazom podataka
      */
     @Override
@@ -59,6 +61,17 @@ public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
         }
 
         Iznajmljivanje iznajmljivanje = (Iznajmljivanje) objekat;
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(iznajmljivanje);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Iznajmljivanje> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
+        }
+
         int brStavki = iznajmljivanje.getListaStavkiIznajmljivanja().size();
         int brIstih = 0;
 
@@ -111,16 +124,12 @@ public class PromeniIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
     }
 
     /**
-     * Izvrsava izmenu iznajmljivanja u bazi podataka.
-     * Izmena se vrsi samo ako ne postoji drugo iznajmljivanje sa identicnim
-     * podacima. Stavke koje su prethodno postojale u bazi, a vise se ne
-     * nalaze u prosledjenoj listi stavki, se brisu. Stavke koje vec postoje
-     * u bazi se azuriraju, a nove stavke se dodaju. Nakon obrade stavki,
-     * ukupan iznos iznajmljivanja se ponovo izracunava na osnovu zbira
-     * iznosa svih prosledjenih stavki, a iznajmljivanje se azurira u bazi.
-     * Na kraju se pokusava ponovo generisati JSON racun za izmenjeno
-     * iznajmljivanje; ukoliko generisanje racuna ne uspe, greska se samo
-     * zapisuje u konzolu i ne prekida izvrsavanje operacije.
+     * Izmena se vrsi samo ako ne postoji drugo iznajmljivanje sa identicnim podacima. Stavke koje su prethodno postojale u bazi, a vise se ne
+     * nalaze u prosledjenoj listi stavki, se brisu. Stavke koje vec postoje u bazi se azuriraju, a nove stavke se dodaju. 
+     * Nakon obrade stavki, ukupan iznos iznajmljivanja se ponovo izracunava na osnovu zbira iznosa svih prosledjenih stavki, 
+     * a iznajmljivanje se azurira u bazi.
+     * Na kraju se pokusava ponovo generisati JSON racun za izmenjeno iznajmljivanje; ukoliko generisanje racuna ne uspe, 
+     * greska se samo zapisuje u konzolu i ne prekida izvrsavanje operacije.
      *
      * @param objekat objekat tipa {@link Iznajmljivanje} koje se izmenjuje
      * @param kljuc nije koriscen u ovoj operaciji

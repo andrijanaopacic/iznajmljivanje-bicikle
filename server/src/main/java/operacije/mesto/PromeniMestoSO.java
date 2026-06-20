@@ -7,7 +7,11 @@ package operacije.mesto;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Bicikla;
 import model.Mesto;
 import operacije.ApstraktnaGenerickaOperacija;
@@ -15,8 +19,7 @@ import repozitorijum.db.DBKonekcija;
 
 /**
  * Sistemska operacija za izmenu postojeceg mesta.
- * Pre izmene proverava da li neko drugo mesto (sa razlicitim ID-om)
- * vec ima isti naziv.
+ * Pre izmene proverava da li neko drugo mesto (sa razlicitim ID-om) vec ima isti naziv.
  *
  * @author Andrijana Opacic
  * @see Mesto
@@ -39,11 +42,13 @@ public class PromeniMestoSO extends ApstraktnaGenerickaOperacija{
     }
     
     /**
-     * Proverava da li je prosledjen parametar odgovarajuceg tipa i
-     * da li neko drugo mesto (razlicitog ID-a) vec ima iste naziv.
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa, da li su vrednosti atributa mesta validne 
+     * (u skladu sa Jakarta Validation anotacijama definisanim u {@link Mesto}), i da li neko drugo mesto
+     * (razlicitog ID-a) vec ima iste naziv.
      *
      * @param objekat objekat tipa {@link Mesto} koji se izmenjuje
-     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws Exception ako parametar nije odgovarajuceg tipa, ili ako
+     *         podaci nisu validni
      * @throws SQLException ako dodje do greske pri radu sa bazom podataka
      */
     @Override
@@ -52,17 +57,25 @@ public class PromeniMestoSO extends ApstraktnaGenerickaOperacija{
             throw new Exception("Nije prosleđen parametar odgovarajućeg tipa.");
         }
 
-        try {
+        Mesto m = (Mesto) objekat;
 
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Mesto>> violations = validator.validate(m);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Mesto> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
+        }
+
+        try {
             String upit = "SELECT * FROM mesto WHERE naziv = '"+((Mesto)objekat).getNaziv()+"'";
             Statement st = DBKonekcija.getInstance().getConnection().createStatement();
             ResultSet rs = st.executeQuery(upit);
-
             while (rs.next()) {
                 postoji = true;
-
             }
-
         } catch (SQLException ex) {
             throw ex;
         }
@@ -70,8 +83,7 @@ public class PromeniMestoSO extends ApstraktnaGenerickaOperacija{
 
     /**
      * Izvrsava izmenu mesta u bazi podataka.
-     * Mesto se izmenjuje samo ako ne postoji drugo mesto sa istim
-     * nazivom.
+     * Mesto se izmenjuje samo ako ne postoji drugo mesto sa istim nazivom.
      *
      * @param objekat objekat tipa {@link Mesto} koji se izmenjuje
      * @param kljuc nije koriscen u ovoj operaciji

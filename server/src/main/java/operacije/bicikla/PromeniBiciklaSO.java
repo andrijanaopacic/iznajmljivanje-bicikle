@@ -3,6 +3,12 @@ package operacije.bicikla;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
+
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Bicikla;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
@@ -33,13 +39,13 @@ public class PromeniBiciklaSO extends ApstraktnaGenerickaOperacija {
     }
 
     /**
-     * Proverava preduslove pre izmene bicikle.
-     * Proverava da li je prosledjen parametar odgovarajuceg tipa i
-     * da li neka druga bicikla (razlicitog ID-a) vec ima iste atribute
-     * (marka, model, boja, cena po satu i cena po danu).
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa, da li su vrednosti atributa bicikle validne 
+     * (u skladu sa Jakarta Validation anotacijama definisanim u {@link Bicikla}), i da li neka druga bicikla
+     * (razlicitog ID-a) vec ima iste atribute (marka, model, boja, cena po satu i cena po danu).
      *
      * @param objekat objekat tipa {@link Bicikla} koji se izmenjuje
-     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws Exception ako parametar nije odgovarajuceg tipa, ili ako
+     *         vrednosti atributa nisu validne
      * @throws SQLException ako dodje do greske pri radu sa bazom podataka
      */
     @Override
@@ -48,6 +54,17 @@ public class PromeniBiciklaSO extends ApstraktnaGenerickaOperacija {
             throw new Exception("Nije prosleđen parametar odgovarajućeg tipa.");
         }
         Bicikla bicikla = (Bicikla) objekat;
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(bicikla);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Bicikla> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
+        }
+
         try {
             String upit = "SELECT * FROM bicikla"
                     + " WHERE marka='" + bicikla.getMarka()

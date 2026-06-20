@@ -6,6 +6,11 @@ package operacije.termin;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Termin;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
@@ -34,18 +39,32 @@ public class PromeniTerminSO extends ApstraktnaGenerickaOperacija{
     }
     
     /**
-     * Proverava da li je prosledjeni objekat odgovarajuceg tipa
-     * i da li vec postoji drugi termin (sa razlicitim ID-om) sa istim
-     * nazivom u bazi. 
+     * Proverava da li je prosledjeni objekat odgovarajuceg tipa, da li su vrednosti atributa termina validne 
+     * (u skladu sa Jakarta Validation anotacijama definisanim u {@link Termin}), i da li vec postoji
+     * drugi termin (sa razlicitim ID-om) sa istim nazivom u bazi.
      *
      * @param objekat objekat tipa {@link Termin} koji se proverava
-     * @throws Exception ako objekat nije odgovarajuceg tipa ili dodje do greske pri radu sa bazom
+     * @throws Exception ako objekat nije odgovarajuceg tipa, ako podaci
+     *         nisu validni, ili dodje do greske pri radu sa bazom
      */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Termin)) {
             throw new Exception("Nije prosleđen parametar odgovarajućeg tipa.");
         }
+
+        Termin termin = (Termin) objekat;
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Termin>> violations = validator.validate(termin);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Termin> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
+        }
+
         try {
             String upit = "SELECT * FROM termin WHERE naziv='" + ((Termin) objekat).getNaziv()
                     + "' AND idTerminDezurstva != " + ((Termin) objekat).getIdTerminDezurstva();
@@ -58,6 +77,8 @@ public class PromeniTerminSO extends ApstraktnaGenerickaOperacija{
             throw ex;
         }
     }
+    
+    
     /**
      * Menja podatke termina ukoliko ne postoji drugi termin sa istim nazivom.
      *

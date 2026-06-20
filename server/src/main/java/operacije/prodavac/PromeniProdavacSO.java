@@ -7,6 +7,11 @@ package operacije.prodavac;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.Set;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Prodavac;
 import model.ProdavacTermin;
 import model.Termin;
@@ -39,16 +44,31 @@ public class PromeniProdavacSO extends ApstraktnaGenerickaOperacija {
     }
 
     /**
-     * Proverava da li je prosledjeni objekat odgovarajuceg tipa.
+     * Proverava da li je prosledjeni objekat odgovarajuceg tipa, i da li
+     * su vrednosti atributa prodavca validne (u skladu sa Jakarta
+     * Validation anotacijama definisanim u {@link Prodavac}).
      * Takodje proverava da li vec postoji prodavac sa istim podacima i istim dodeljenim terminima.
      *
      * @param objekat objekat tipa {@link Prodavac} koji se proverava
-     * @throws Exception ako objekat nije odgovarajuceg tipa ili dodje do greske pri radu sa bazom
+     * @throws Exception ako objekat nije odgovarajuceg tipa, ako podaci
+     *         nisu validni, ili dodje do greske pri radu sa bazom
      */
     @Override
     protected void preduslovi(Object objekat) throws Exception {
         if (objekat == null || !(objekat instanceof Prodavac)) {
             throw new Exception("Nije prosleđen parametar odgovarajućeg tipa.");
+        }
+
+        Prodavac prodavac = (Prodavac) objekat;
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(prodavac);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Prodavac> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
         }
 
         int brTer = ((Prodavac) objekat).getProdavacTermini().size();

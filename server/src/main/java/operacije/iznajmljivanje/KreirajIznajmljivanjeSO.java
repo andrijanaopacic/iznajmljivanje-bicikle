@@ -4,17 +4,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.Set;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Iznajmljivanje;
 import model.StavkaIznajmljivanja;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
- * Sistemska operacija za kreiranje novog iznajmljivanja zajedno sa svim
- * njegovim stavkama. Pre kreiranja proverava da li identicno iznajmljivanje
- * (sa istim ukupnim iznosom, prodavcem, kupcem i istim stavkama) vec
- * postoji u bazi podataka. Nakon uspesnog kreiranja, automatski generise
- * i JSON racun za novokreirano iznajmljivanje.
+ * Sistemska operacija za kreiranje novog iznajmljivanja zajedno sa svim njegovim stavkama. 
+ * Pre kreiranja proverava da li su vrednosti atributa iznajmljivanja validne, 
+ * i da li identicno iznajmljivanje (sa istim ukupnim iznosom, prodavcem, kupcem i istim stavkama) 
+ * vec postoji u bazi podataka. Nakon uspesnog kreiranja, automatski generise i JSON racun za novokreirano iznajmljivanje.
  *
  * @author Andrijana Opacic
  * @see Iznajmljivanje
@@ -39,15 +42,13 @@ public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
     }
 
     /**
-     * Proverava preduslove pre kreiranja iznajmljivanja.
-     * Proverava da li je prosledjen parametar odgovarajuceg tipa i da li
-     * identicno iznajmljivanje (sa istim ukupnim iznosom, prodavcem, kupcem
-     * i istim brojem podudarajucih stavki) vec postoji u bazi podataka.
-     * Iznajmljivanje se smatra postojecim samo ako se broj podudarajucih
-     * stavki poklapa sa ukupnim brojem stavki prosledjenog iznajmljivanja.
+     * Proverava da li je prosledjen parametar odgovarajuceg tipa, da li su vrednosti atributa iznajmljivanja validne 
+     * (u skladu sa Jakarta Validation anotacijama definisanim u {@link Iznajmljivanje}), i da li identicno iznajmljivanje 
+     * (sa istim ukupnim iznosom, prodavcem, kupcem i istim brojem podudarajucih stavki) vec postoji u bazi podataka.
      *
      * @param objekat objekat tipa {@link Iznajmljivanje} koje se kreira
-     * @throws Exception ako parametar nije odgovarajuceg tipa
+     * @throws Exception ako parametar nije odgovarajuceg tipa, ili ako
+     *         vrednosti atributa nisu validne
      * @throws SQLException ako dodje do greske pri radu sa bazom podataka
      */
     @Override
@@ -57,6 +58,17 @@ public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
         }
 
         Iznajmljivanje iznajmljivanje = (Iznajmljivanje) objekat;
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(iznajmljivanje);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Iznajmljivanje> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
+        }
+
         int brStavki = iznajmljivanje.getListaStavkiIznajmljivanja().size();
         int brIstih = 0;
 
@@ -108,13 +120,10 @@ public class KreirajIznajmljivanjeSO extends ApstraktnaGenerickaOperacija {
     }
 
     /**
-     * Izvrsava kreiranje iznajmljivanja u bazi podataka.
-     * Iznajmljivanje se kreira samo ako ne postoji u bazi podataka. Nakon
-     * dodavanja iznajmljivanja, preuzima se automatski generisani ID i
-     * koristi se da se sve stavke iznajmljivanja povezu sa njim i upisu u
-     * bazu. Na kraju se pokusava generisati JSON racun za novokreirano
-     * iznajmljivanje; ukoliko generisanje racuna ne uspe, greska se samo
-     * zapisuje u konzolu i ne prekida izvrsavanje operacije.
+     * Iznajmljivanje se kreira samo ako ne postoji u bazi podataka. Nakon dodavanja iznajmljivanja, preuzima se automatski generisani ID i
+     * koristi se da se sve stavke iznajmljivanja povezu sa njim i upisu u bazu. Na kraju se pokusava generisati J
+     * SON racun za novokreirano iznajmljivanje; ukoliko generisanje racuna ne uspe, greska se samo zapisuje u konzolu 
+     * i ne prekida izvrsavanje operacije.
      *
      * @param objekat objekat tipa {@link Iznajmljivanje} koje se kreira
      * @param kljuc nije koriscen u ovoj operaciji

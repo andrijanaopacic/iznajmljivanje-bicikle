@@ -7,14 +7,18 @@ package operacije.kupac;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import model.Kupac;
 import operacije.ApstraktnaGenerickaOperacija;
 import repozitorijum.db.DBKonekcija;
 
 /**
  * Sistemska operacija za kreiranje novog kupca.
- * Validira osnovne podatke kupca i proverava da li kupac sa istim podacima
- * vec postoji u bazi.
+ * Validira osnovne podatke kupca i proverava da li kupac sa istim podacima vec postoji u bazi.
  *
  * @author Andrijana Opacic
  * @see Kupac
@@ -37,8 +41,8 @@ public class KreirajKupacSO extends ApstraktnaGenerickaOperacija {
     }
 
     /**
-     * Validira ime, prezime i broj licne karte kupca (mora imati 9 cifara),
-     * i proverava da li kupac sa istim podacima vec postoji u bazi.
+     * Validira vrednosti atributa kupca (ime, prezime, broj licne karte i mesto, u skladu sa Jakarta Validation anotacijama definisanim u
+     * {@link Kupac}), i proverava da li kupac sa istim podacima vec postoji u bazi.
      *
      * @param parametar objekat tipa {@link Kupac} koji se kreira
      * @throws Exception ako parametar nije odgovarajuceg tipa, ili ako
@@ -47,40 +51,32 @@ public class KreirajKupacSO extends ApstraktnaGenerickaOperacija {
      */
     @Override
     protected void preduslovi(Object parametar) throws Exception {
-
         if (parametar == null || !(parametar instanceof Kupac)) {
             throw new Exception("Nije prosleđen parametar odgovarajućeg tipa.");
         }
         
         Kupac k = (Kupac) parametar;
-        if(k.getIme() == null || k.getIme().isEmpty()){
-            throw new Exception("Greška prilikom unosa imena.");
-        }
-        if(k.getPrezime()== null || k.getPrezime().isEmpty()){
-            throw new Exception("Greška prilikom unosa prezimena.");
-        }
-        if (k.getBrojLicneKarte() == null || k.getBrojLicneKarte().isEmpty()) {
-            throw new Exception("Greška prilikom unosa broja lične karte.");
-        }
-        if (!k.getBrojLicneKarte().matches("\\d{9}")) {
-            throw new Exception("Broj lične karte mora sadržati 9 cifara.");
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+        if (!violations.isEmpty()) {
+            StringBuilder poruka = new StringBuilder();
+            for (ConstraintViolation<Kupac> v : violations) {
+                poruka.append(v.getMessage()).append(" ");
+            }
+            throw new Exception(poruka.toString().trim());
         }
 
         try {
-
             String upit = "SELECT * FROM kupac k JOIN mesto m ON k.idMesto = m.idMesto WHERE k.ime='" + ((Kupac) parametar).getIme() + "' AND k.prezime='" + ((Kupac) parametar).getPrezime() + "' AND k.brojLicneKarte='" + ((Kupac) parametar).getBrojLicneKarte() + "' AND m.naziv='" + ((Kupac) parametar).getMesto().getNaziv() + "'";
             Statement st = DBKonekcija.getInstance().getConnection().createStatement();
             ResultSet rs = st.executeQuery(upit);
-
             while (rs.next()) {
-
                 postoji = true;
             }
-
         } catch (SQLException ex) {
             throw ex;
         }
-
     }
 
     /**
