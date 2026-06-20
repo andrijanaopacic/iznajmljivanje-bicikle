@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +15,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
 class KupacTest {
 
     Kupac k;
+    Validator validator;
 
     @Mock
     ResultSet rs;
@@ -26,6 +32,7 @@ class KupacTest {
     @BeforeEach
     void setUp() throws Exception {
         k = new Kupac();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
         closeable = MockitoAnnotations.openMocks(this);
     }
 
@@ -55,8 +62,8 @@ class KupacTest {
 
     @Test
     void testSetBrojLicneKarte() {
-        k.setBrojLicneKarte("123456");
-        assertEquals("123456", k.getBrojLicneKarte());
+        k.setBrojLicneKarte("123456789");
+        assertEquals("123456789", k.getBrojLicneKarte());
     }
 
     @Test
@@ -109,18 +116,16 @@ class KupacTest {
 
     @Test
     void testVratiKoloneZaUbacivanje() {
-        assertEquals("ime,prezime,brojLicneKarte,idMesto",
-                k.vratiKoloneZaUbacivanje());
+        assertEquals("ime,prezime,brojLicneKarte,idMesto", k.vratiKoloneZaUbacivanje());
     }
 
     @Test
     void testVratiVrednostiZaUbacivanje() {
         k.setIme("Marko");
         k.setPrezime("Markovic");
-        k.setBrojLicneKarte("123456");
+        k.setBrojLicneKarte("123456789");
         k.setMesto(new Mesto(1, "Beograd"));
-        assertEquals("'Marko','Markovic','123456',1",
-                k.vratiVrednostiZaUbacivanje());
+        assertEquals("'Marko','Markovic','123456789',1", k.vratiVrednostiZaUbacivanje());
     }
 
     @Test
@@ -133,10 +138,9 @@ class KupacTest {
     void testVratiVrednostiZaIzmenu() {
         k.setIme("Marko");
         k.setPrezime("Markovic");
-        k.setBrojLicneKarte("123456");
+        k.setBrojLicneKarte("123456789");
         k.setMesto(new Mesto(1, "Beograd"));
-        assertEquals("ime = 'Marko',prezime = 'Markovic',brojLicneKarte = '123456',idMesto = 1",
-                k.vratiVrednostiZaIzmenu());
+        assertEquals("ime = 'Marko',prezime = 'Markovic',brojLicneKarte = '123456789',idMesto = 1", k.vratiVrednostiZaIzmenu());
     }
 
     @Test
@@ -145,7 +149,7 @@ class KupacTest {
         when(rs.getInt("kupac.idKupac")).thenReturn(1);
         when(rs.getString("kupac.ime")).thenReturn("Marko");
         when(rs.getString("kupac.prezime")).thenReturn("Markovic");
-        when(rs.getString("kupac.brojLicneKarte")).thenReturn("123456");
+        when(rs.getString("kupac.brojLicneKarte")).thenReturn("123456789");
         when(rs.getInt("kupac.idMesto")).thenReturn(1);
         when(rs.getString("mesto.naziv")).thenReturn("Beograd");
 
@@ -158,7 +162,7 @@ class KupacTest {
         assertEquals(1, result.getIdKupac());
         assertEquals("Marko", result.getIme());
         assertEquals("Markovic", result.getPrezime());
-        assertEquals("123456", result.getBrojLicneKarte());
+        assertEquals("123456789", result.getBrojLicneKarte());
         assertEquals("Beograd", result.getMesto().getNaziv());
     }
 
@@ -178,7 +182,7 @@ class KupacTest {
         when(rs.getInt("kupac.idKupac")).thenReturn(1);
         when(rs.getString("kupac.ime")).thenReturn("Marko");
         when(rs.getString("kupac.prezime")).thenReturn("Markovic");
-        when(rs.getString("kupac.brojLicneKarte")).thenReturn("123456");
+        when(rs.getString("kupac.brojLicneKarte")).thenReturn("123456789");
         when(rs.getInt("kupac.idMesto")).thenReturn(1);
         when(rs.getString("mesto.naziv")).thenReturn("Beograd");
 
@@ -188,7 +192,7 @@ class KupacTest {
         assertEquals(1, result.getIdKupac());
         assertEquals("Marko", result.getIme());
         assertEquals("Markovic", result.getPrezime());
-        assertEquals("123456", result.getBrojLicneKarte());
+        assertEquals("123456789", result.getBrojLicneKarte());
         assertEquals("Beograd", result.getMesto().getNaziv());
     }
 
@@ -200,7 +204,7 @@ class KupacTest {
 
         assertNull(result);
     }
-    
+
     @Test
     void testPodrazumevaniKonstruktor() {
         assertNotNull(k);
@@ -209,21 +213,98 @@ class KupacTest {
     @Test
     void testKonstruktorSaId() {
         Mesto mesto = new Mesto(1, "Beograd");
-        Kupac noviKupac = new Kupac(1, "Marko", "Markovic", "123456", mesto);
+        Kupac noviKupac = new Kupac(1, "Marko", "Markovic", "123456789", mesto);
         assertEquals(1, noviKupac.getIdKupac());
         assertEquals("Marko", noviKupac.getIme());
         assertEquals("Markovic", noviKupac.getPrezime());
-        assertEquals("123456", noviKupac.getBrojLicneKarte());
+        assertEquals("123456789", noviKupac.getBrojLicneKarte());
         assertEquals(mesto, noviKupac.getMesto());
     }
 
     @Test
     void testKonstruktorBezId() {
         Mesto mesto = new Mesto(1, "Beograd");
-        Kupac noviKupac = new Kupac("Marko", "Markovic", "123456", mesto);
+        Kupac noviKupac = new Kupac("Marko", "Markovic", "123456789", mesto);
         assertEquals("Marko", noviKupac.getIme());
         assertEquals("Markovic", noviKupac.getPrezime());
-        assertEquals("123456", noviKupac.getBrojLicneKarte());
+        assertEquals("123456789", noviKupac.getBrojLicneKarte());
         assertEquals(mesto, noviKupac.getMesto());
+    }
+
+    @Test
+    void testValidacijaProlaziKadaSuSveVrednostiValidne() {
+        k.setIme("Marko");
+        k.setPrezime("Markovic");
+        k.setBrojLicneKarte("123456789");
+        k.setMesto(new Mesto(1, "Beograd"));
+
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+
+        assertTrue(violations.isEmpty(), "Ne treba biti violations kada su sve vrednosti validne");
+    }
+
+    @Test
+    void testValidacijaPraznoIme() {
+        k.setIme("");
+        k.setPrezime("Markovic");
+        k.setBrojLicneKarte("123456789");
+        k.setMesto(new Mesto(1, "Beograd"));
+
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Ime ne moze biti prazno")));
+    }
+
+    @Test
+    void testValidacijaPraznoPrezime() {
+        k.setIme("Marko");
+        k.setPrezime("");
+        k.setBrojLicneKarte("123456789");
+        k.setMesto(new Mesto(1, "Beograd"));
+
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Prezime ne moze biti prazno")));
+    }
+
+    @Test
+    void testValidacijaBrojLicneKarteNull() {
+        k.setIme("Marko");
+        k.setPrezime("Markovic");
+        k.setBrojLicneKarte(null);
+        k.setMesto(new Mesto(1, "Beograd"));
+
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Broj licne karte ne moze biti null")));
+    }
+
+    @Test
+    void testValidacijaBrojLicneKarteNeispravanFormat() {
+        k.setIme("Marko");
+        k.setPrezime("Markovic");
+        k.setBrojLicneKarte("123456");
+        k.setMesto(new Mesto(1, "Beograd"));
+
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Broj licne karte mora sadrzati 9 cifara")));
+    }
+
+    @Test
+    void testValidacijaMestoNull() {
+        k.setIme("Marko");
+        k.setPrezime("Markovic");
+        k.setBrojLicneKarte("123456789");
+        k.setMesto(null);
+
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Mesto ne moze biti null")));
     }
 }

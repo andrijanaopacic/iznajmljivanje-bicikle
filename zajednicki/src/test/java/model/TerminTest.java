@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +15,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
 class TerminTest {
 
     Termin t;
+    Validator validator;
 
     @Mock
     ResultSet rs;
@@ -26,6 +32,7 @@ class TerminTest {
     @BeforeEach
     void setUp() throws Exception {
         t = new Termin();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
         closeable = MockitoAnnotations.openMocks(this);
     }
 
@@ -127,6 +134,45 @@ class TerminTest {
         ApstraktniDomenskiObjekat result = t.vratiObjekatIzRS(rs);
 
         assertNull(result);
+    }
+    
+    @Test
+    void testValidacijaProlaziKadaSuSveVrednostiValidne() {
+        t.setNaziv("Jutarnja");
+
+        Set<ConstraintViolation<Termin>> violations = validator.validate(t);
+
+        assertTrue(violations.isEmpty(), "Ne treba biti violations kada su sve vrednosti validne");
+    }
+
+    @Test
+    void testValidacijaPrazanNaziv() {
+        t.setNaziv("");
+
+        Set<ConstraintViolation<Termin>> violations = validator.validate(t);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Naziv termina ne moze biti prazan")));
+    }
+
+    @Test
+    void testValidacijaNullNaziv() {
+        t.setNaziv(null);
+
+        Set<ConstraintViolation<Termin>> violations = validator.validate(t);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Naziv termina ne moze biti prazan")));
+    }
+
+    @Test
+    void testValidacijaNazivDuziOd30Karaktera() {
+        t.setNaziv("OvoJeNazivTerminaKojiImaViseOdTridesetKaraktera");
+
+        Set<ConstraintViolation<Termin>> violations = validator.validate(t);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Naziv termina ne moze imati vise od 30 karaktera")));
     }
 
 }

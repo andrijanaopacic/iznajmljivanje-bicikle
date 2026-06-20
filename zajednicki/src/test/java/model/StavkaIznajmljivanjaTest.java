@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +16,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
 class StavkaIznajmljivanjaTest {
 
     StavkaIznajmljivanja stavka;
     BiciklaZaOdrasle bicikla;
     Iznajmljivanje iznajmljivanje;
+    Validator validator;
 
     @Mock
     ResultSet rs;
@@ -31,6 +37,7 @@ class StavkaIznajmljivanjaTest {
         stavka = new StavkaIznajmljivanja();
         bicikla = new BiciklaZaOdrasle();
         iznajmljivanje = new Iznajmljivanje();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
         closeable = MockitoAnnotations.openMocks(this);
     }
 
@@ -267,5 +274,92 @@ class StavkaIznajmljivanjaTest {
 
         assertNotNull(lista);
         assertEquals(0, lista.size());
+    }
+    
+    @Test
+    void testValidacijaProlaziKadaSuSveVrednostiValidne() {
+        bicikla.setIdBicikla(1);
+        bicikla.setCenaPoSatu(500.0);
+        bicikla.setCenaPoDanu(2000.0);
+        iznajmljivanje.setIdIznajmljivanje(1);
+
+        LocalDateTime vremeOd = LocalDateTime.of(2025, 10, 10, 10, 0, 0);
+        LocalDateTime vremeDo = LocalDateTime.of(2025, 10, 10, 12, 0, 0);
+
+        StavkaIznajmljivanja s = new StavkaIznajmljivanja(bicikla, 1, 0, 0, vremeOd, vremeDo, 2, 0, iznajmljivanje);
+
+        Set<ConstraintViolation<StavkaIznajmljivanja>> violations = validator.validate(s);
+
+        assertTrue(violations.isEmpty(), "Ne treba biti violations kada su sve vrednosti validne");
+    }
+
+    @Test
+    void testValidacijaBiciklaNull() {
+        iznajmljivanje.setIdIznajmljivanje(1);
+        LocalDateTime vremeOd = LocalDateTime.of(2025, 10, 10, 10, 0, 0);
+        LocalDateTime vremeDo = LocalDateTime.of(2025, 10, 10, 12, 0, 0);
+
+        stavka.setBicikla(null);
+        stavka.setVremeOd(vremeOd);
+        stavka.setVremeDo(vremeDo);
+        stavka.setIznajmljivanje(iznajmljivanje);
+
+        Set<ConstraintViolation<StavkaIznajmljivanja>> violations = validator.validate(stavka);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Bicikla ne moze biti null")));
+    }
+
+    @Test
+    void testValidacijaVremeOdUBuducnosti() {
+        bicikla.setIdBicikla(1);
+        iznajmljivanje.setIdIznajmljivanje(1);
+        LocalDateTime vremeOd = LocalDateTime.now().plusDays(1);
+        LocalDateTime vremeDo = LocalDateTime.now().plusDays(2);
+
+        stavka.setBicikla(bicikla);
+        stavka.setVremeOd(vremeOd);
+        stavka.setVremeDo(vremeDo);
+        stavka.setIznajmljivanje(iznajmljivanje);
+
+        Set<ConstraintViolation<StavkaIznajmljivanja>> violations = validator.validate(stavka);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Vreme pocetka ne moze biti u buducnosti")));
+    }
+
+    @Test
+    void testValidacijaVremeDoUBuducnosti() {
+        bicikla.setIdBicikla(1);
+        iznajmljivanje.setIdIznajmljivanje(1);
+        LocalDateTime vremeOd = LocalDateTime.of(2025, 10, 10, 10, 0, 0);
+        LocalDateTime vremeDo = LocalDateTime.now().plusDays(1);
+
+        stavka.setBicikla(bicikla);
+        stavka.setVremeOd(vremeOd);
+        stavka.setVremeDo(vremeDo);
+        stavka.setIznajmljivanje(iznajmljivanje);
+
+        Set<ConstraintViolation<StavkaIznajmljivanja>> violations = validator.validate(stavka);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Vreme zavrsetka ne moze biti u buducnosti")));
+    }
+
+    @Test
+    void testValidacijaIznajmljivanjeNull() {
+        bicikla.setIdBicikla(1);
+        LocalDateTime vremeOd = LocalDateTime.of(2025, 10, 10, 10, 0, 0);
+        LocalDateTime vremeDo = LocalDateTime.of(2025, 10, 10, 12, 0, 0);
+
+        stavka.setBicikla(bicikla);
+        stavka.setVremeOd(vremeOd);
+        stavka.setVremeDo(vremeDo);
+        stavka.setIznajmljivanje(null);
+
+        Set<ConstraintViolation<StavkaIznajmljivanja>> violations = validator.validate(stavka);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Iznajmljivanje ne moze biti null")));
     }
 }

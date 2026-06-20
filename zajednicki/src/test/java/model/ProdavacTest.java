@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +15,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
 class ProdavacTest {
 
     Prodavac p;
+    Validator validator;
 
     @Mock
     ResultSet rs;
@@ -26,6 +32,7 @@ class ProdavacTest {
     @BeforeEach
     void setUp() throws Exception {
         p = new Prodavac();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
         closeable = MockitoAnnotations.openMocks(this);
     }
 
@@ -199,5 +206,122 @@ class ProdavacTest {
         ApstraktniDomenskiObjekat result = p.vratiObjekatIzRS(rs);
 
         assertNull(result);
+    }
+    
+    @Test
+    void testValidacijaProlaziKadaSuSveVrednostiValidne() {
+        p.setIme("Ana");
+        p.setPrezime("Anic");
+        p.setKorisnickoIme("aanic");
+        p.setSifra("sifra123");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertTrue(violations.isEmpty(), "Ne treba biti violations kada su sve vrednosti validne");
+    }
+
+    @Test
+    void testValidacijaPraznoIme() {
+        p.setIme("");
+        p.setPrezime("Anic");
+        p.setKorisnickoIme("aanic");
+        p.setSifra("sifra123");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Ime ne moze biti prazno")));
+    }
+
+    @Test
+    void testValidacijaImeDuzeOd30Karaktera() {
+        p.setIme("OvoJeImeKojeImaViseOdTridesetKaraktera");
+        p.setPrezime("Anic");
+        p.setKorisnickoIme("aanic");
+        p.setSifra("sifra123");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Ime ne moze imati vise od 30 karaktera")));
+    }
+
+    @Test
+    void testValidacijaPraznoPrezime() {
+        p.setIme("Ana");
+        p.setPrezime("");
+        p.setKorisnickoIme("aanic");
+        p.setSifra("sifra123");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Prezime ne moze biti prazno")));
+    }
+
+    @Test
+    void testValidacijaPrezimeDuzeOd30Karaktera() {
+        p.setIme("Ana");
+        p.setPrezime("OvoJePrezimeKojeImaViseOdTridesetKaraktera");
+        p.setKorisnickoIme("aanic");
+        p.setSifra("sifra123");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Prezime ne moze imati vise od 30 karaktera")));
+    }
+
+    @Test
+    void testValidacijaPraznoKorisnickoIme() {
+        p.setIme("Ana");
+        p.setPrezime("Anic");
+        p.setKorisnickoIme("");
+        p.setSifra("sifra123");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Korisnicko ime ne moze biti prazno")));
+    }
+
+    @Test
+    void testValidacijaKorisnickoImeDuzeOd20Karaktera() {
+        p.setIme("Ana");
+        p.setPrezime("Anic");
+        p.setKorisnickoIme("korisnickoImeKojeImaViseOd20Karaktera");
+        p.setSifra("sifra123");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Korisnicko ime ne moze imati vise od 20 karaktera")));
+    }
+
+    @Test
+    void testValidacijaPraznaSifra() {
+        p.setIme("Ana");
+        p.setPrezime("Anic");
+        p.setKorisnickoIme("aanic");
+        p.setSifra("");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Sifra ne moze biti prazna")));
+    }
+
+    @Test
+    void testValidacijaSifraDuzaOd20Karaktera() {
+        p.setIme("Ana");
+        p.setPrezime("Anic");
+        p.setKorisnickoIme("aanic");
+        p.setSifra("sifraKojaImaViseOd20Karaktera");
+
+        Set<ConstraintViolation<Prodavac>> violations = validator.validate(p);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Sifra ne moze imati vise od 20 karaktera")));
     }
 }

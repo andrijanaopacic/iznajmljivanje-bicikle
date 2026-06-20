@@ -5,10 +5,13 @@ import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import jakarta.validation.ConstraintViolation;
 
 class BiciklaZaOdrasleTest extends BiciklaTest {
 
@@ -152,5 +155,69 @@ class BiciklaZaOdrasleTest extends BiciklaTest {
         assertEquals("Trek", result.getMarka());
         assertEquals(26, ((BiciklaZaOdrasle) result).getVelicinaTockova());
         assertEquals(21, ((BiciklaZaOdrasle) result).getBrojBrzina());
+    }
+    
+    @Override
+    @Test
+    void testValidacijaProlaziKadaSuSveVrednostiValidne() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaZaOdrasle) b).setVelicinaTockova(26);
+        ((BiciklaZaOdrasle) b).setBrojBrzina(21);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertTrue(violations.isEmpty(), "Ne treba biti violations kada su sve vrednosti validne");
+    }
+
+    @Test
+    void testValidacijaVelicinaTockovaNula() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaZaOdrasle) b).setVelicinaTockova(0);
+        ((BiciklaZaOdrasle) b).setBrojBrzina(21);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Velicina tockova mora biti veca od nule")));
+    }
+
+    @Test
+    void testValidacijaBrojBrzinaNula() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaZaOdrasle) b).setVelicinaTockova(26);
+        ((BiciklaZaOdrasle) b).setBrojBrzina(0);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Broj brzina mora biti veci od nule")));
+    }
+    
+    @Test
+    void testValidacijaBrojBrzinaVeciOd30() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaZaOdrasle) b).setVelicinaTockova(26);
+        ((BiciklaZaOdrasle) b).setBrojBrzina(31);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Broj brzina ne moze biti veci od 30")));
     }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,8 +28,9 @@ public class BiciklaZaOdrasle extends Bicikla {
 	@Positive(message = "Velicina tockova mora biti veca od nule")
     private int velicinaTockova;
     
-    /** Broj brzina bicikle za odrasle, mora biti veci od nule. */
+	/** Broj brzina bicikle za odrasle, mora biti veci od nule i ne veci od 30. */
 	@Positive(message = "Broj brzina mora biti veci od nule")
+	@Max(value = 30, message = "Broj brzina ne moze biti veci od 30")
     private int brojBrzina;
 
 

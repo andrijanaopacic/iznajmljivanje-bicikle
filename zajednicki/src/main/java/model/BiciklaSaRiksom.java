@@ -219,4 +219,5 @@ public class BiciklaSaRiksom extends Bicikla {
         int maxNosivost = rs.getInt("biciklasariksom.maxNosivost");
         return new BiciklaSaRiksom(id, cenaPoSatu, cenaPoDanu, marka, model, boja, brojSedista, tipRikse, maxNosivost);
     }
+    
 }

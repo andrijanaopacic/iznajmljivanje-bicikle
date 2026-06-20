@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +16,16 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
 class IznajmljivanjeTest {
 
     Iznajmljivanje i;
     Kupac kupac;
     Prodavac prodavac;
+    Validator validator;
 
     @Mock
     ResultSet rs;
@@ -31,6 +37,7 @@ class IznajmljivanjeTest {
         kupac = new Kupac(1, "Marko", "Markovic", "123456", new Mesto(1, "Beograd"));
         prodavac = new Prodavac(1, "Ana", "Anic", "aanic", "sifra");
         i = new Iznajmljivanje();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
         closeable = MockitoAnnotations.openMocks(this);
     }
 
@@ -237,5 +244,95 @@ class IznajmljivanjeTest {
         ApstraktniDomenskiObjekat result = i.vratiObjekatIzRS(rs);
 
         assertNull(result);
+    }
+    
+    @Test
+    void testValidacijaProlaziKadaSuSveVrednostiValidne() {
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        stavke.add(new StavkaIznajmljivanja());
+        i.setUkupanIznos(5000.0);
+        i.setListaStavkiIznajmljivanja(stavke);
+        i.setKupac(kupac);
+        i.setProdavac(prodavac);
+
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
+
+        assertTrue(violations.isEmpty(), "Ne treba biti violations kada su sve vrednosti validne");
+    }
+
+    @Test
+    void testValidacijaUkupanIznosNula() {
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        stavke.add(new StavkaIznajmljivanja());
+        i.setUkupanIznos(0.0);
+        i.setListaStavkiIznajmljivanja(stavke);
+        i.setKupac(kupac);
+        i.setProdavac(prodavac);
+
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Ukupan iznos mora biti veci od nule")));
+    }
+
+    @Test
+    void testValidacijaListaStavkiPrazna() {
+        i.setUkupanIznos(5000.0);
+        i.setListaStavkiIznajmljivanja(new ArrayList<>());
+        i.setKupac(kupac);
+        i.setProdavac(prodavac);
+
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Lista stavki ne moze biti prazna")));
+    }
+
+    @Test
+    void testValidacijaListaStavkiNull() {
+        i.setUkupanIznos(5000.0);
+        i.setListaStavkiIznajmljivanja(null);
+        i.setKupac(kupac);
+        i.setProdavac(prodavac);
+
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Lista stavki ne moze biti prazna")));
+    }
+
+    @Test
+    void testValidacijaKupacNull() {
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        stavke.add(new StavkaIznajmljivanja());
+        i.setUkupanIznos(5000.0);
+        i.setListaStavkiIznajmljivanja(stavke);
+        i.setKupac(null);
+        i.setProdavac(prodavac);
+
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Kupac ne moze biti null")));
+    }
+
+    @Test
+    void testValidacijaProdavacNull() {
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        stavke.add(new StavkaIznajmljivanja());
+        i.setUkupanIznos(5000.0);
+        i.setListaStavkiIznajmljivanja(stavke);
+        i.setKupac(kupac);
+        i.setProdavac(null);
+
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Prodavac ne moze biti null")));
     }
 }

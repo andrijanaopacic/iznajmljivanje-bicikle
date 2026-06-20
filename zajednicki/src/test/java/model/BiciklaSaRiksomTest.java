@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import jakarta.validation.ConstraintViolation;
 
 class BiciklaSaRiksomTest extends BiciklaTest {
 
@@ -163,5 +166,76 @@ class BiciklaSaRiksomTest extends BiciklaTest {
         assertEquals(2, ((BiciklaSaRiksom) result).getBrojSedista());
         assertEquals("putnicka", ((BiciklaSaRiksom) result).getTipRikse());
         assertEquals(100, ((BiciklaSaRiksom) result).getMaxNosivost());
+    }
+    
+    @Override
+    @Test
+    void testValidacijaProlaziKadaSuSveVrednostiValidne() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaSaRiksom) b).setBrojSedista(2);
+        ((BiciklaSaRiksom) b).setTipRikse("putnicka");
+        ((BiciklaSaRiksom) b).setMaxNosivost(100);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertTrue(violations.isEmpty(), "Ne treba biti violations kada su sve vrednosti validne");
+    }
+
+    @Test
+    void testValidacijaBrojSedistaNula() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaSaRiksom) b).setBrojSedista(0);
+        ((BiciklaSaRiksom) b).setTipRikse("putnicka");
+        ((BiciklaSaRiksom) b).setMaxNosivost(100);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Broj sedista mora biti veci od nule")));
+    }
+
+    @Test
+    void testValidacijaPrazanTipRikse() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaSaRiksom) b).setBrojSedista(2);
+        ((BiciklaSaRiksom) b).setTipRikse("");
+        ((BiciklaSaRiksom) b).setMaxNosivost(100);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Tip rikse ne moze biti prazan")));
+    }
+
+    @Test
+    void testValidacijaMaxNosivostNula() {
+        b.setCenaPoSatu(500.0);
+        b.setCenaPoDanu(2000.0);
+        b.setMarka("Trek");
+        b.setModel("Marlin");
+        b.setBoja("Crvena");
+        ((BiciklaSaRiksom) b).setBrojSedista(2);
+        ((BiciklaSaRiksom) b).setTipRikse("putnicka");
+        ((BiciklaSaRiksom) b).setMaxNosivost(0);
+
+        Set<ConstraintViolation<Bicikla>> violations = validator.validate(b);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Maksimalna nosivost mora biti veca od nule")));
     }
 }
