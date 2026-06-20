@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
@@ -29,8 +30,9 @@ import lombok.Setter;
 public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializable {
 
 	/** Iznajmljena bicikla u okviru ove stavke, ne sme biti null. */
-    @NotNull(message = "Bicikla ne moze biti null")
-    private Bicikla bicikla;
+	@NotNull(message = "Bicikla ne moze biti null")
+	@Valid
+	private Bicikla bicikla;
     
     /** Jedinstveni identifikator stavke iznajmljivanja u bazi podataka. */
     private int idStavkaIznajmljivanja;
@@ -57,6 +59,7 @@ public class StavkaIznajmljivanja implements ApstraktniDomenskiObjekat, Serializ
     
     /** Iznajmljivanje u okviru kojeg se nalazi ova stavka, ne sme biti null. */
     @NotNull(message = "Iznajmljivanje ne moze biti null")
+    @Valid
     private Iznajmljivanje iznajmljivanje;
 
 

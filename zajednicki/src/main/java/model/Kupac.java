@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -44,6 +45,7 @@ public class Kupac implements ApstraktniDomenskiObjekat, Serializable {
 
     /** Mesto u kojem kupac zivi, ne sme biti null. */
     @NotNull(message = "Mesto ne moze biti null")
+    @Valid
     private Mesto mesto;
 
     /**

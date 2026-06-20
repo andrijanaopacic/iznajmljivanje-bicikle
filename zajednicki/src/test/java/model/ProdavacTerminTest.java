@@ -232,8 +232,7 @@ class ProdavacTerminTest {
         Set<ConstraintViolation<ProdavacTermin>> violations = validator.validate(pt);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Prodavac ne moze biti null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Prodavac ne moze biti null")));
     }
 
     @Test
@@ -249,8 +248,7 @@ class ProdavacTerminTest {
         Set<ConstraintViolation<ProdavacTermin>> violations = validator.validate(pt);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Termin ne moze biti null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Termin ne moze biti null")));
     }
 
     @Test
@@ -266,8 +264,7 @@ class ProdavacTerminTest {
         Set<ConstraintViolation<ProdavacTermin>> violations = validator.validate(pt);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Datum dezurstva ne moze biti null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Datum dezurstva ne moze biti null")));
     }
 
     @Test
@@ -284,7 +281,40 @@ class ProdavacTerminTest {
         Set<ConstraintViolation<ProdavacTermin>> violations = validator.validate(pt);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Smena ne moze biti prazna")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Smena ne moze biti prazna")));
+    }
+    
+    @Test
+    void testValidacijaProdavacNevalidanZbogPraznogImena() {
+        Prodavac p = new Prodavac(1, "", "Anic", "aanic", "sifra123");
+        Termin t = new Termin(1, "Jutarnja");
+        LocalDate datum = LocalDate.of(2025, 10, 10);
+
+        pt.setProdavac(p);
+        pt.setTermin(t);
+        pt.setDatumDezurstva(datum);
+        pt.setSmena("jutarnja");
+
+        Set<ConstraintViolation<ProdavacTermin>> violations = validator.validate(pt);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Ime ne moze biti prazno")));
+    }
+
+    @Test
+    void testValidacijaTerminNevalidanZbogPraznogNaziva() {
+        Prodavac p = new Prodavac(1, "Ana", "Anic", "aanic", "sifra123");
+        Termin t = new Termin(1, "");
+        LocalDate datum = LocalDate.of(2025, 10, 10);
+
+        pt.setProdavac(p);
+        pt.setTermin(t);
+        pt.setDatumDezurstva(datum);
+        pt.setSmena("jutarnja");
+
+        Set<ConstraintViolation<ProdavacTermin>> violations = validator.validate(pt);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Naziv termina ne moze biti prazan")));
     }
 }

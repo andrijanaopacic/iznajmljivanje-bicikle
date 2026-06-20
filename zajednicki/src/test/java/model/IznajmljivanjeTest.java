@@ -34,7 +34,7 @@ class IznajmljivanjeTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        kupac = new Kupac(1, "Marko", "Markovic", "123456", new Mesto(1, "Beograd"));
+        kupac = new Kupac(1, "Marko", "Markovic", "123456789", new Mesto(1, "Beograd"));
         prodavac = new Prodavac(1, "Ana", "Anic", "aanic", "sifra");
         i = new Iznajmljivanje();
         validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -272,8 +272,7 @@ class IznajmljivanjeTest {
         Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Ukupan iznos mora biti veci od nule")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Ukupan iznos mora biti veci od nule")));
     }
 
     @Test
@@ -286,8 +285,7 @@ class IznajmljivanjeTest {
         Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Lista stavki ne moze biti prazna")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Lista stavki ne moze biti prazna")));
     }
 
     @Test
@@ -300,8 +298,7 @@ class IznajmljivanjeTest {
         Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Lista stavki ne moze biti prazna")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Lista stavki ne moze biti prazna")));
     }
 
     @Test
@@ -316,8 +313,7 @@ class IznajmljivanjeTest {
         Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Kupac ne moze biti null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Kupac ne moze biti null")));
     }
 
     @Test
@@ -332,7 +328,22 @@ class IznajmljivanjeTest {
         Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
 
         assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getMessage().equals("Prodavac ne moze biti null")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Prodavac ne moze biti null")));
+    }
+    
+    @Test
+    void testValidacijaKupacNevalidanZbogPraznogImena() {
+        Kupac nevalidanKupac = new Kupac(1, "", "Markovic", "123456789", new Mesto(1, "Beograd"));
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        stavke.add(new StavkaIznajmljivanja());
+        i.setUkupanIznos(5000.0);
+        i.setListaStavkiIznajmljivanja(stavke);
+        i.setKupac(nevalidanKupac);
+        i.setProdavac(prodavac);
+
+        Set<ConstraintViolation<Iznajmljivanje>> violations = validator.validate(i);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Ime ne moze biti prazno")));
     }
 }

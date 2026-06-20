@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -47,10 +48,12 @@ public class Iznajmljivanje implements ApstraktniDomenskiObjekat,Serializable{
     
     /** Kupac koji je napravio iznajmljivanje, ne sme biti null. */
     @NotNull(message = "Kupac ne moze biti null")
+    @Valid
     private Kupac kupac;
     
     /** Prodavac koji je obradio iznajmljivanje, ne sme biti null. */
     @NotNull(message = "Prodavac ne moze biti null")
+    @Valid
     private Prodavac prodavac;
 
 

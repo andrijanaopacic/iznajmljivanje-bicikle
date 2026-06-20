@@ -281,7 +281,21 @@ class StavkaIznajmljivanjaTest {
         bicikla.setIdBicikla(1);
         bicikla.setCenaPoSatu(500.0);
         bicikla.setCenaPoDanu(2000.0);
+        bicikla.setMarka("Trek");
+        bicikla.setModel("Marlin");
+        bicikla.setBoja("Crvena");
+        bicikla.setVelicinaTockova(26);
+        bicikla.setBrojBrzina(21);
+
+        Kupac kupac = new Kupac(1, "Marko", "Markovic", "123456789", new Mesto(1, "Beograd"));
+        Prodavac prodavac = new Prodavac(1, "Ana", "Anic", "aanic", "sifra123");
         iznajmljivanje.setIdIznajmljivanje(1);
+        iznajmljivanje.setUkupanIznos(1000.0);
+        iznajmljivanje.setKupac(kupac);
+        iznajmljivanje.setProdavac(prodavac);
+        List<StavkaIznajmljivanja> stavke = new ArrayList<>();
+        stavke.add(new StavkaIznajmljivanja());
+        iznajmljivanje.setListaStavkiIznajmljivanja(stavke);
 
         LocalDateTime vremeOd = LocalDateTime.of(2025, 10, 10, 10, 0, 0);
         LocalDateTime vremeDo = LocalDateTime.of(2025, 10, 10, 12, 0, 0);

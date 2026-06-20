@@ -307,4 +307,17 @@ class KupacTest {
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Mesto ne moze biti null")));
     }
+    
+    @Test
+    void testValidacijaMestoNevalidnoZbogPraznogNaziva() {
+        k.setIme("Marko");
+        k.setPrezime("Markovic");
+        k.setBrojLicneKarte("123456789");
+        k.setMesto(new Mesto(1, ""));
+
+        Set<ConstraintViolation<Kupac>> violations = validator.validate(k);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Naziv mesta ne moze biti prazan")));
+    }
 }
